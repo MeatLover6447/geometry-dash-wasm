@@ -20,7 +20,10 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/configure-pages@v5
       - name: Verify complete native package
-        run: node tests/verify-build.mjs
+        run: |
+          node tests/verify-build.mjs
+          node tests/benchmark.test.mjs
+          node tests/worker.test.mjs
       - name: Prepare static Pages build
         run: node scripts/build-pages.mjs
       - uses: actions/upload-pages-artifact@v4
