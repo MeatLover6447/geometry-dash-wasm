@@ -6,9 +6,9 @@
 - Public GitHub Pages build: https://meatlover6447.github.io/geometry-dash-wasm/?perf
 - Full source and game package: https://github.com/MeatLover6447/geometry-dash-wasm
 
-The online host remains owner-private: sign in with the same ChatGPT account on your Chromebook. Its small Worker streams the original compressed payloads from the exact GitHub commit `a2f5077ee6f2180015c02c3ff99206156218746c` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. The deployed archive is 2,145,282 bytes; all game resources remain available from GitHub.
+The online host is public and opens without ChatGPT sign-in. Its small Worker streams the original compressed payloads from the exact GitHub commit `a2f5077ee6f2180015c02c3ff99206156218746c` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. The deployed archive is 2,145,282 bytes; all game resources remain available from GitHub.
 
-Live checks returned HTTP 200 and valid responses for `getCustomContentURL.php` and `getGJLevels21.php`. Account login and online uploads have not been tested. GitHub Pages serves the full native game for built-in play, editor, saves, and FPS testing; online services require the online-enabled host.
+Anonymous requests for the game page and content URL returned HTTP 200 after the public access change. Live checks returned HTTP 200 and valid responses for `getCustomContentURL.php` and `getGJLevels21.php`. Account login and online uploads have not been tested. GitHub Pages serves the full native game for built-in play, editor, saves, and FPS testing; online services require the online-enabled host.
 
 The online host passed a real Chromium boot and built-in-level gameplay check with no browser errors or failed requests. The 20-second test measured **59.8 native FPS average**, with a **910 MiB WASM heap**, on this Windows machine. Cold first frame took 38.2 seconds including downloads. These are not Chromebook measurements. Raw results: `evidence/hosted-browser-check.json`.
 

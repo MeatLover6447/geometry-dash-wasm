@@ -6,7 +6,7 @@ The supplied installation is compatible with the runtime: all three executable `
 
 ## Play
 
-- [Online-enabled host and FPS test](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf) — owner-private; sign in with the same ChatGPT account on your Chromebook.
+- [Online-enabled host and FPS test](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf) — public; no ChatGPT sign-in required.
 - [Public GitHub Pages and FPS test](https://meatlover6447.github.io/geometry-dash-wasm/?perf) — built-in levels, editor, and browser saves; online services are unavailable here.
 
 [HOSTING.md](HOSTING.md) describes the deployed builds and checks. First load downloads about 300 MB; repeat visits use the browser cache. Each host keeps separate browser saves.
