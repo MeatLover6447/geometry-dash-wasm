@@ -6,6 +6,11 @@ The supplied installation is compatible with the runtime: all three executable `
 
 ## Play
 
+- [Online-enabled host and FPS test](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf) — owner-private; sign in with the same ChatGPT account on your Chromebook.
+- [Public GitHub Pages and FPS test](https://meatlover6447.github.io/geometry-dash-wasm/?perf) — built-in levels, editor, and browser saves; online services are unavailable here.
+
+[HOSTING.md](HOSTING.md) describes the deployed builds and checks. First load downloads about 300 MB; repeat visits use the browser cache. Each host keeps separate browser saves.
+
 GitHub Pages builds are created by `.github/workflows/pages.yml`. Run `node scripts/build-pages.mjs` to stage the same static build locally. The raw 123 MB WASM is generated only during deployment; the repository retains its original compressed payload, under GitHub's individual-file limit. Pages supports built-in levels, the editor, browser saves, and the FPS counter, but needs a backend for online game services.
 
 Add `?perf` to the game URL to enable a 20-second native FPS test. Keep the tab visible and play a level during the test. This reports native frame-count averages; it does not measure total input-to-display latency.

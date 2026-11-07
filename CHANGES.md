@@ -35,3 +35,11 @@ A 10-second native gameplay diagnostic observed about 60 FPS and 17.9 ms frame p
 All three original executable code sections and 8,998 local resources matched the supplied installation. Patched runtime images differ in data/pointer sections and remain paired with the precompiled runtime. See `evidence/native-runtime-compatibility.json`.
 
 An editor check created one object, saved, reloaded, and reopened the native level. The encrypted native save was 864 bytes before and after reload, byte-identical, with one decoded level object and no browser errors. See `evidence/native-save-check.json`. Two extended editor sessions encountered a native abort; its cause remains unresolved. This passing check does not establish exhaustive editor stability.
+
+## Hosted builds
+
+The complete package is uploaded to `MeatLover6447/geometry-dash-wasm`, with GitHub Pages deployed through Actions. Pages generates raw native WASM during deployment so it can serve the correct native HTTP response without committing a file over GitHub's file-size limit. The Pages CDN returned it with `application/wasm` and gzip encoding.
+
+The online-enabled host deploys a 2.1 MB browser shell and restricted service bridge; it streams the original compressed payloads from a pinned GitHub commit. This resolves the host's 256 MiB deployment input limit without removing game resources. Its existing owner-private access is preserved. Live content-URL and online level-list requests both returned valid HTTP 200 responses. No paid hosting account was added.
+
+Both hosted builds passed native boot and built-in-level gameplay in Chromium. Each 20-second test measured 59.8 native FPS average on this Windows machine, with a 910 MiB WASM heap. See `evidence/hosted-browser-check.json` and `evidence/pages-browser-check.json`. Chromebook performance, account login, and online uploads remain untested.

@@ -1,0 +1,30 @@
+{
+  "url": "https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf",
+  "errors": [],
+  "failedRequests": [],
+  "services": {
+    "contentUrl": {
+      "status": 200,
+      "bytes": 35,
+      "sample": "https://geometrydashfiles.b-cdn.net"
+    },
+    "levels": {
+      "status": 200,
+      "bytes": 3680,
+      "sample": "1:10565740:2:Bloodbath:5:3:6:503085:8:10:9:50:10:196185982:12:0:13:21:14:5678370:17:1:43:6:25::18:10:19:3206:42:0:45:24746:3:V2hvc2UgYmxvb2Q"
+    }
+  },
+  "engine": {
+    "status": 200,
+    "type": "application/wasm",
+    "encoding": "gzip"
+  },
+  "firstFrameSeconds": 38.203,
+  "game": {
+    "fps": "60 fps",
+    "benchmark": "59.8 native fps avg · WASM heap 910 MiB",
+    "frames": 1536,
+    "heapMiB": 909.625,
+    "error": ""
+  }
+}

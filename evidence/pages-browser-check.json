@@ -1,0 +1,19 @@
+{
+  "url": "https://meatlover6447.github.io/geometry-dash-wasm/?perf",
+  "errors": [],
+  "failedRequests": [],
+  "services": {},
+  "engine": {
+    "status": 200,
+    "type": "application/wasm",
+    "encoding": "gzip"
+  },
+  "firstFrameSeconds": 25.195,
+  "game": {
+    "fps": "60 fps",
+    "benchmark": "59.8 native fps avg · WASM heap 910 MiB",
+    "frames": 1509,
+    "heapMiB": 909.625,
+    "error": ""
+  }
+}
