@@ -1,0 +1,31 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const destination=process.argv[2];assert(destination&&path.isAbsolute(destination),'Pass an absolute destination directory');
+fs.mkdirSync(destination,{recursive:true});assert.equal(fs.readdirSync(destination).length,0,'Host destination must be empty');
+const source=path.join(destination,'public/game');fs.cpSync(path.join(root,'dist'),source,{recursive:true});
+const manifest=JSON.parse(fs.readFileSync(path.join(source,'gd_assets.json'),'utf8'));
+const compressed=fs.readFileSync(path.join(source,manifest.wasm.url));
+const parts=[];
+for(let offset=0,index=0;offset<compressed.length;offset+=14*1024*1024,index++){
+ const name=`payload/wasm-${manifest.wasm.sha256.slice(0,24)}-${index}.bin`;
+ fs.writeFileSync(path.join(source,name),compressed.subarray(offset,offset+14*1024*1024));parts.push('/game/'+name);
+}
+const combined=Buffer.concat(parts.map(name=>fs.readFileSync(path.join(destination,'public',name))));
+assert.deepEqual(combined,compressed,'Hosted parts must reconstruct exact upstream compressed WASM');
+fs.unlinkSync(path.join(source,manifest.wasm.url));
+const info={sha256:manifest.wasm.sha256,compressedSize:compressed.length,parts};
+const worker=fs.readFileSync(path.join(root,'hosting/worker.mjs'),'utf8').replace('__ENGINE_INFO__',JSON.stringify(info));
+fs.writeFileSync(path.join(destination,'worker.mjs'),worker);
+const hosting=JSON.parse(fs.readFileSync(path.join(root,'.openai/hosting.json'),'utf8'));delete hosting.static;
+fs.mkdirSync(path.join(destination,'.openai'),{recursive:true});fs.writeFileSync(path.join(destination,'.openai/hosting.json'),JSON.stringify(hosting));
+fs.writeFileSync(path.join(destination,'package.json'),JSON.stringify({name:'geometry-dash-native-web',private:true,type:'module',scripts:{build:'node build.mjs'}}));
+fs.writeFileSync(path.join(destination,'.gitignore'),'dist/\nnode_modules/\n');
+fs.writeFileSync(path.join(destination,'build.mjs'),`import fs from 'node:fs';\nfs.mkdirSync('dist/server',{recursive:true});\nfs.cpSync('public','dist/client',{recursive:true});\nfs.copyFileSync('worker.mjs','dist/server/index.js');\nfs.mkdirSync('dist/.openai',{recursive:true});\nfs.copyFileSync('.openai/hosting.json','dist/.openai/hosting.json');\nfs.writeFileSync('dist/server/wrangler.json',JSON.stringify({main:'index.js',compatibility_date:'2026-05-15',assets:{directory:'../client',binding:'ASSETS'}}));\nconsole.log('Built native game assets and streaming Worker');\n`);
+fs.copyFileSync(path.join(root,'README.md'),path.join(destination,'README.md'));fs.copyFileSync(path.join(root,'CHANGES.md'),path.join(destination,'CHANGES.md'));
+const maxFile=(dir)=>fs.readdirSync(dir,{withFileTypes:true}).reduce((max,e)=>Math.max(max,e.isDirectory()?maxFile(path.join(dir,e.name)):fs.statSync(path.join(dir,e.name)).size),0);
+assert(maxFile(path.join(destination,'public'))<25*1024*1024,'Every hosted asset must fit the platform limit');
+console.log(`Prepared complete host source: ${destination}; exact compressed WASM split into ${parts.length} static assets.`);

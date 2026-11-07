@@ -1,0 +1,610 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#000000"><link rel="icon" href="ref/logo.png"><title>Geometry Dash · Native WASM</title><style>html{background:#000;}body{margin:0;height:100%;color:#ddd;font-family:monospace;overflow:hidden;}#bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}body.playing #bg::before{animation:none;filter:none;}#bg::before{content:"";position:absolute;top:-4%;left:0;width:200%;height:108%;background:url("ref/fondo_gd.jpg") repeat-x;background-size:50% 100%;filter:blur(12px);animation:bgdrift 90s linear infinite;}@keyframes bgdrift{from{transform:translateX(0);}to{transform:translateX(-50%);}}@media (prefers-reduced-motion:reduce){#bg::before{animation:none;}}#app{display:flex;flex-direction:column;height:100vh;}#logoDock{flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 2px;opacity:0;transition:opacity .45s linear;}#logoDock.in{opacity:1;}#logoDock img{max-height:64px;max-width:40vw;width:auto;height:auto;}#stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:center;transform:translateY(-170%);transition:transform .55s cubic-bezier(.2,.85,.25,1);}#stage.in{transform:translateY(0);}canvas{max-width:96vw;max-height:100%;width:auto;height:auto;background:#000;image-rendering:pixelated;outline:none;display:block;user-select:none;}#midbar{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:8px 0 6px;font-size:12px;color:#aaa;opacity:0;transform:translateY(120%);transition:transform .55s cubic-bezier(.2,.85,.25,1),opacity .45s;}#midbar.in{opacity:1;transform:translateY(0);}#bars{display:flex;flex-direction:column;gap:5px;transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .45s;}#bars.fall{transform:translateY(30px);opacity:0;pointer-events:none;}.abrow{display:flex;align-items:center;gap:7px;}.ablabel{width:100px;text-align:right;color:#888;font-size:10px;letter-spacing:.5px;white-space:nowrap;}.abtrack{position:relative;width:220px;height:8px;background:#111;border:1px solid #333;border-radius:4px;overflow:hidden;}.abfill{width:0%;height:100%;background:#ccc;border-radius:3px;transition:width .15s;}.abpct{width:118px;text-align:left;color:#999;font-size:11px;white-space:nowrap;}#bootbars{display:none;align-items:center;gap:7px;}#bootbars.on{display:flex;animation:bootdrop .5s cubic-bezier(.2,.85,.25,1);}@keyframes bootdrop{from{transform:translateY(-16px);opacity:0;}to{transform:translateY(0);opacity:1;}}#bootbars.done{transform:translateY(36px);opacity:0;transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .45s;pointer-events:none;}#fps{display:flex;align-items:center;gap:5px;color:#999;will-change:transform;}#fps svg{display:block;flex:0 0 auto;}#console{flex:0 0 auto;height:18vh;min-height:90px;max-height:200px;margin:0 8px 8px;padding:6px 8px;overflow-y:auto;font-size:12px;line-height:1.35;color:#999;background:#0a0a0a;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word;user-select:text;cursor:text;transform:translateY(135%);transition:transform .55s cubic-bezier(.2,.85,.25,1);}#console.in{transform:translateY(0);}#start{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:transparent;transition:opacity .5s;}#start.hide{opacity:0;pointer-events:none;}#logoFly{margin-top:14vh;transition:transform .45s cubic-bezier(.2,.9,.25,1);}#logoFly img{max-height:200px;max-width:70vw;width:auto;height:auto;}#logoFly.up{transform:translateY(-13vh) scale(.32);}#loadFly{margin-bottom:30vh;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform 1.15s cubic-bezier(.45,0,.6,1),opacity 1.15s linear;}#loadFly img{max-height:150px;max-width:40vw;width:auto;height:auto;display:block;transition:transform .15s;}#loadFly img:hover{transform:scale(1.08);}#loadFly.down{transform:translateY(32vh) scale(.8);opacity:0;}#fsBtn,#clearBtn,#saveBtn{font:12px/1 monospace;color:#ccc;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;padding:4px 8px;cursor:pointer;transition:color .2s;}#fsBtn:hover,#clearBtn:hover,#saveBtn:hover{color:#fff;}#credit{color:#888;font-size:11px;white-space:nowrap;}#canvas:fullscreen{max-width:none;max-height:none;width:100%;height:100%;}#canvas:-webkit-full-screen{max-width:none;max-height:none;width:100%;height:100%;}#errOverlay{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:50;max-width:min(92vw,720px);display:none;background:#1a0000;border:1px solid #a33;color:#ffd7d7;font-size:12px;padding:8px 12px;border-radius:6px;white-space:pre-wrap;}#errOverlay.on{display:block;}canvas{touch-action:none;}</style><style>canvas{image-rendering:auto}#credit{position:fixed;bottom:5px;right:10px;font:10px monospace;color:#888}#loadFly:focus-visible{outline:2px solid #b8ff37}</style></head><body><div id="errOverlay" role="alert"></div><div id="bg"></div><div id="app"><div id="logoDock"><img src="ref/logo.png" alt="logo" onerror="this.style.display='none'"></div><div id="stage"><canvas id="canvas" width="1920" height="1080"></canvas></div><div id="midbar"><div id="bars"><div class="abrow"><span class="ablabel" id="wasmLabel">WASM</span><div class="abtrack"><div class="abfill" id="wasmFill"></div></div><span class="abpct" id="wasmPct">0%</span></div><div class="abrow"><span class="ablabel" id="dataLabel">DATA</span><div class="abtrack"><div class="abfill" id="dataFill"></div></div><span class="abpct" id="dataPct">0%</span></div></div><div id="bootbars"><div class="abtrack"><div class="abfill" id="bootFill"></div></div><span class="abpct" id="bootPct">0%</span></div><div id="fps"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.2" y="2" width="13.6" height="9" rx="1.6" fill="none" stroke="#888" stroke-width="1.4"/><rect x="6.5" y="12" width="3" height="2" fill="#888"/><rect x="4.5" y="14.2" width="7" height="1.3" rx="0.6" fill="#888"/></svg><span id="fpsval">-- fps</span></div><span id="version" style="font-size:10px"></span><span id="perfval" style="font-size:10px" title="Queue delay is event-to-game polling, not total display latency"></span><button id="fsBtn" type="button">Fullscreen</button><button id="saveBtn" type="button" title="Save game progress and local levels">Save progress</button><button id="clearBtn" type="button" title="Delete saved progress and login">Reset progress</button></div><div id="console"></div></div><div id="start"><div id="logoFly"><img src="ref/logo.png" alt="logo" onerror="this.style.display='none'"></div><div id="loadFly" role="button" tabindex="0" aria-label="Load Geometry Dash"><img src="ref/load.png" alt="load" onerror="this.parentElement.textContent='LOADING…';this.remove()"></div></div><script src="gd_assets.js?v=355fd7ea115fb3b236d2d6a5"></script><script>var consoleEl = document.getElementById('console');
+try { Error.stackTraceLimit = 400; } catch (e) {}
+var gdQuality = new URLSearchParams(location.search).get('quality');
+var gdLowMemory = gdQuality !== 'high';
+if (gdLowMemory) {
+var gdCanvas = document.getElementById('canvas');
+gdCanvas.width = 1280; gdCanvas.height = 720;
+}
+
+var GD_DEBUG = /[?&]debug(=|&|$)/.test(location.search);
+if (!GD_DEBUG) {
+try { console.log = console.info = console.debug = function () {}; }
+catch (e) {}
+consoleEl.style.display = 'none';
+}
+var logQueue = [], logScheduled = false;
+window.gdLogRaw = [];
+var GD_LOG_DOM_MAX = 500;
+window.gdLogDump = function () { return window.gdLogRaw.join('\n'); };
+function flushLog() {
+logScheduled = false;
+if (!logQueue.length) return;
+var frag = document.createDocumentFragment();
+for (var i = 0; i < logQueue.length; i++) {
+var line = document.createElement('div');
+line.textContent = logQueue[i];
+frag.appendChild(line);
+}
+logQueue = [];
+var nearBottom =
+consoleEl.scrollHeight - consoleEl.scrollTop - consoleEl.clientHeight < 40;
+consoleEl.appendChild(frag);
+while (consoleEl.childNodes.length > GD_LOG_DOM_MAX)
+consoleEl.removeChild(consoleEl.firstChild);
+if (nearBottom) consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+var seenDep = Object.create(null);
+var QUIET = ['[frame]', '[webgl]', '[io]', '[tex]', '[pngc]',
+'[pngd]', '[fmtf]', '[sink]', '[htb]', '[disp]', '[rawin]',
+'[touch]', '[cte]', '[list]', '[drs]', '[tex2]'];
+function isQuiet(str) {
+for (var i = 0; i < QUIET.length; ++i) {
+if (str.lastIndexOf(QUIET[i], 0) === 0) return true;
+}
+return false;
+}
+function say(s) {
+if (!GD_DEBUG) return;
+var str = String(s);
+if (/[?&]hostlog(=|&|$)/.test(location.search) &&
+    /^\[(autosave|zlib|persist|thread|gd)\]/.test(str))
+fetch('__debug_log', {method: 'POST', body: str, keepalive: true}).catch(function () {});
+if (!isQuiet(str)) console.log(s);
+if (str.indexOf('dependency: ') === 0 ||
+str.indexOf('still waiting on run dependencies') === 0 ||
+str === '(end of list)') {
+if (seenDep[str]) return;
+seenDep[str] = 1;
+}
+window.gdLogRaw.push(str);
+if (window.gdLogRaw.length > 10000)
+window.gdLogRaw.splice(0, 2000);
+logQueue.push(str);
+if (!logScheduled) {
+logScheduled = true;
+requestAnimationFrame(flushLog);
+}
+}
+var gdProg = 0, gdProgDone = false;
+var gdAssetDone = { wasm: false, data: false };
+var gdAssetsFell = false;
+var wasmFill = document.getElementById('wasmFill');
+var dataFill = document.getElementById('dataFill');
+var wasmPct = document.getElementById('wasmPct');
+var dataPct = document.getElementById('dataPct');
+var wasmLabel = document.getElementById('wasmLabel');
+var dataLabel = document.getElementById('dataLabel');
+var bootFill = document.getElementById('bootFill');
+var bootPct = document.getElementById('bootPct');
+function gdFmtSize(n) {
+if (!n) return '0 MB';
+if (n < 1048576) return Math.round(n / 1024) + ' KB';
+return (n / 1048576).toFixed(1) + ' MB';
+}
+var GD_SIZE_HINT = { wasm: 123481510, data: 322237583 };
+var GD_BUILD_ID = '355fd7ea115fb3b236d2d6a5';
+var GD_ASSET_CACHE = 'gdwasm-assets';
+function gdClearCache() {
+if (!confirm('Clear saved progress and login on this site?\n' +
+'The game reloads afterwards.'))
+return;
+try { if (Module && Module._gd_autosave_set) Module._gd_autosave_set(0); }
+catch (e) {}
+var jobs = [];
+if (window.caches) jobs.push(caches.delete(GD_ASSET_CACHE));
+jobs.push(new Promise(function (res) {
+try {
+var r = indexedDB.deleteDatabase('gdwasm_saves');
+r.onsuccess = r.onerror = r.onblocked = function () { res(); };
+} catch (e) { res(); }
+}));
+try {
+localStorage.removeItem('gdWasmSize');
+localStorage.removeItem('gdDataSize');
+} catch (e) {}
+Promise.all(jobs).then(function () { location.reload(); },
+function () { location.reload(); });
+}
+function gdSizeHint(which) {
+return which === 'wasm' ? GD_SIZE_HINT.wasm : GD_SIZE_HINT.data;
+}
+function gdLearnedSize(which) {
+try {
+return Number(localStorage.getItem(
+which === 'wasm' ? 'gdWasmSize' : 'gdDataSize')) || 0;
+} catch (e) { return 0; }
+}
+function setAssetBar(which, loaded, total) {
+var fill = which === 'wasm' ? wasmFill : dataFill;
+var pctEl = which === 'wasm' ? wasmPct : dataPct;
+var label = which === 'wasm' ? wasmLabel : dataLabel;
+if (!fill) return;
+var name = which === 'wasm' ? 'WASM' : 'DATA';
+var learned = gdLearnedSize(which);
+var hint = gdSizeHint(which);
+var known = hint > 0 ? hint
+: (learned > 0 ? learned : (total > 0 ? total : 0));
+var exact = known > 0;
+if (label) {
+var fallback = which === 'wasm' ? 110 * 1024 * 1024 : 320 * 1024 * 1024;
+label.textContent = name + ' (' + (exact ? '' : '~') +
+gdFmtSize(known > 0 ? known : fallback) + ')';
+}
+var p;
+if (known > 0) {
+p = Math.min(100, loaded / known * 100);
+} else {
+var est = which === 'wasm' ? 110 * 1024 * 1024 : 320 * 1024 * 1024;
+p = Math.min(95, loaded / est * 95);
+}
+fill.style.width = p.toFixed(1) + '%';
+if (loaded <= 0) pctEl.textContent = '0%';
+else if (known > 0) {
+pctEl.textContent = p.toFixed(0) + '% (' + gdFmtSize(loaded) + ')';
+} else {
+pctEl.textContent = gdFmtSize(loaded);
+}
+if (known > 0 && loaded >= known) {
+gdAssetDone[which] = true;
+try {
+localStorage.setItem(which === 'wasm' ? 'gdWasmSize' : 'gdDataSize',
+String(Math.max(loaded, known)));
+} catch (e) {}
+}
+if (gdAssetDone.wasm && gdAssetDone.data) assetsDone();
+}
+function forceAssetsDone() {
+gdAssetDone.wasm = true;
+gdAssetDone.data = true;
+setAssetBar('wasm', 1, 1);
+setAssetBar('data', 1, 1);
+assetsDone();
+}
+function assetsDone() {
+if (gdAssetsFell) return;
+gdAssetsFell = true;
+var bars = document.getElementById('bars');
+var boot = document.getElementById('bootbars');
+if (bars) bars.classList.add('fall');
+setTimeout(function () {
+if (bars) bars.style.display = 'none';
+if (boot) boot.classList.add('on');
+}, 520);
+}
+function bootDone() {
+var boot = document.getElementById('bootbars');
+if (!boot || boot.classList.contains('done')) return;
+boot.classList.add('done');
+setTimeout(function () { boot.style.display = 'none'; }, 520);
+}
+function setProgress(p, exact) {
+if (gdProgDone && p < 100) return;
+p = Math.max(0, Math.min(100, p));
+if (p < gdProg && !exact) return;
+gdProg = p;
+if (bootFill) bootFill.style.width = p.toFixed(1) + '%';
+if (bootPct) bootPct.textContent = p.toFixed(0) + '%';
+if (p >= 100) { gdProgDone = true; bootDone(); }
+}
+function resetProgress() {
+gdProgDone = false;
+gdProg = 0;
+gdAssetsFell = false;
+gdAssetDone = { wasm: false, data: false };
+var bars = document.getElementById('bars');
+var boot = document.getElementById('bootbars');
+if (bars) { bars.style.display = ''; bars.classList.remove('fall'); }
+if (boot) { boot.classList.remove('on'); boot.classList.remove('done'); }
+setAssetBar('wasm', 0, gdLearnedSize('wasm'));
+setAssetBar('data', 0, gdLearnedSize('data'));
+if (bootFill) bootFill.style.width = '0%';
+if (bootPct) bootPct.textContent = '0%';
+}
+window.gdFirstFrame = function () {
+forceAssetsDone();
+setProgress(100);
+};
+var gdSaveTimer = null;
+var gdLastSave = 0;
+function scheduleSave(now) {
+if (!window.__gdGotFrame) return;
+if (gdSaveTimer) clearTimeout(gdSaveTimer);
+gdSaveTimer = setTimeout(function () {
+gdSaveTimer = null;
+if (!now && Date.now() - gdLastSave < 180000) return;
+gdLastSave = Date.now();
+try { if (Module._gd_request_save) Module._gd_request_save(); } catch (e) {}
+}, now ? 0 : 4000);
+}
+document.addEventListener('visibilitychange', function () {
+if (document.hidden) scheduleSave(true);
+});
+function gdProgressTick() {
+if (!window.__gdLoadStarted || gdProgDone) return;
+if (!gdAssetsFell) {
+var df = Module.dataFileDownloads;
+if (df) {
+for (var k in df) {
+var e = df[k];
+var which = /wasm/i.test(k) ? 'wasm'
+: (/\.data/i.test(k) ? 'data' : null);
+if (which) setAssetBar(which, e.loaded || 0, e.total || 0);
+}
+}
+} else if (gdProg < 78) {
+setProgress(gdProg + 0.35);
+}
+}
+setInterval(gdProgressTick, 200);
+document.addEventListener('visibilitychange', function () {
+if (!document.hidden) gdProgressTick();
+});
+(function () {
+var fpsEl = document.getElementById('fpsval');
+var benchmarkButton, benchmarkResult, benchmark = null;
+function cancelBenchmark(message) {
+if (!benchmark) return;
+benchmark = null;
+benchmarkButton.disabled = !window.__gdRuntimeReady || !Module._gd_frames_get || document.hidden;
+benchmarkButton.textContent = '20s test';
+benchmarkResult.textContent = message;
+}
+if (/[?&]perf(=|&|$)/.test(location.search)) {
+benchmarkButton = document.createElement('button');
+benchmarkButton.textContent = '20s test';
+benchmarkButton.disabled = true;
+benchmarkButton.title = 'Measure average native FPS and WASM heap over 20 seconds. Keep the game focused.';
+benchmarkButton.style.cssText = 'font:12px monospace;color:#ccc;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;padding:4px 8px;cursor:pointer';
+benchmarkResult = document.createElement('span');
+benchmarkResult.id = 'benchmarkResult';
+benchmarkResult.setAttribute('role', 'status');
+benchmarkResult.style.fontSize = '11px';
+document.getElementById('midbar').appendChild(benchmarkButton);
+document.getElementById('midbar').appendChild(benchmarkResult);
+benchmarkButton.addEventListener('click', function () {
+if (!window.__gdRuntimeReady || !Module._gd_frames_get || document.hidden || benchmark) return;
+benchmarkResult.textContent = '';
+try {
+benchmark = {started: performance.now(), frames: Module._gd_frames_get() >>> 0};
+} catch (e) {
+benchmarkResult.textContent = 'Native frame counter unavailable';
+return;
+}
+benchmarkButton.disabled = true;
+benchmarkButton.textContent = 'Testing 20s';
+Module.canvas.focus({preventScroll:true});
+});
+document.addEventListener('visibilitychange', function () {
+if (document.hidden) cancelBenchmark('Test cancelled: game was hidden');
+});
+window.addEventListener('blur', function () {
+cancelBenchmark('Test cancelled: game lost focus');
+});
+}
+var lastT = performance.now(), lastN = 0, primed = false;
+function tick(now) {
+if (now - lastT >= 500) {
+if (!window.__gdRuntimeReady) {
+lastT = now;
+requestAnimationFrame(tick);
+return;
+}
+var n = 0, counterAvailable = false;
+try {
+if (Module._gd_frames_get) {
+n = Module._gd_frames_get() | 0;
+counterAvailable = true;
+}
+} catch (e) {}
+if (benchmarkButton) {
+benchmarkButton.disabled = !counterAvailable || !!benchmark;
+if (benchmark && !counterAvailable) cancelBenchmark('Test cancelled: native frame counter unavailable');
+if (benchmark) {
+var elapsed = now - benchmark.started;
+benchmarkButton.textContent = 'Testing '+Math.max(0,Math.ceil((20000-elapsed)/1000))+'s';
+if (elapsed >= 20000) {
+var average = (((n >>> 0) - benchmark.frames) >>> 0) * 1000 / elapsed;
+benchmarkResult.textContent = average.toFixed(1)+' native fps avg · WASM heap '+(Module.HEAPU8 ? Math.round(Module.HEAPU8.byteLength/1048576)+' MiB' : 'unavailable');
+benchmark = null;
+benchmarkButton.disabled = false;
+benchmarkButton.textContent = '20s test';
+}
+}
+}
+if (n > 0) {
+if (primed)
+fpsEl.textContent =
+Math.round((n - lastN) * 1000 / (now - lastT)) + ' fps';
+var perf = document.getElementById('perfval');
+if(perf && /[?&]perf(=|&|$)/.test(location.search) && Module.gdInputStats){
+var stats=Module.gdInputStats;
+var details='Frame p95 '+stats.frameP95Ms.toFixed(1)+' ms';
+if(stats.samples) details+=' | input queue p95 '+stats.queueP95Ms.toFixed(1)+' ms';
+if(Module.HEAPU8) details+=' | WASM '+Math.round(Module.HEAPU8.byteLength/1048576)+' MiB';
+var audio=Module.__gdAudio;
+var render=Module.gdRenderStats;
+if(render) details+=' | GL matrices '+render.matrixUploads+' ('+render.matrixSkipped+' cached), empty draws '+render.emptyDrawsSkipped;
+if(audio && audio.ctx){
+details+=' | audio '+audio.ctx.state;
+if(audio.metrics) details+=' (starts '+audio.metrics.starts+', seeks '+audio.metrics.seeks+')';
+}
+perf.textContent=details;
+if(stats.pointerClient) perf.title='Pointer client '+stats.pointerClient.join(',')+'; game '+stats.pointerGame.join(',');
+}
+lastN = n;
+primed = true;
+if (!window.__gdGotFrame) {
+window.__gdGotFrame = true;
+window.__gdInputReady = true;
+if (window.__gdAckFocus) window.__gdAckFocus();
+document.body.classList.add('playing');
+setProgress(100);
+}
+} else if (!primed) {
+fpsEl.textContent = '-- fps';
+}
+lastT = now;
+}
+requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+})();
+function dumpTrace() {
+if (!window.__gdRuntimeReady) { say('runtime not initialized; no trace'); return; }
+try {
+if (!Module._gd_trace_count) { say('no trace exports'); return; }
+var n = Module._gd_trace_count();
+var m = Math.min(48, n);
+var out = [];
+for (var i = 0; i < m; ++i) {
+var va = Module._gd_trace_at(i);
+if (typeof va === 'bigint') va = Number(va & 0xffffffffn);
+else va = va >>> 0;
+out.push('0x' + va.toString(16));
+}
+say('TRACE total=' + n + ' newest-first: ' + out.join(' '));
+} catch (e) { say('trace dump failed: ' + e); }
+}
+function dumpRegs() {
+if (!window.__gdRuntimeReady) return;
+try {
+if (!Module._gd_reg) { say('no register export'); return; }
+var names = ['RAX', 'RCX', 'RDX', 'RBX', 'RSP', 'RBP', 'RSI', 'RDI',
+'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15'];
+var out = [];
+for (var i = 0; i < names.length; ++i) {
+var v = Module._gd_reg(i);
+var hex = (typeof v === 'bigint')
+? (v & 0xffffffffffffffffn).toString(16).padStart(16, '0')
+: (v >>> 0).toString(16).padStart(8, '0');
+out.push(names[i] + '=0x' + hex);
+}
+say('REGS ' + out.join(' '));
+if (Module._gd_where) {
+var w = Module._gd_where();
+say('WHERE va=0x' + (typeof w === 'bigint'
+? (w & 0xffffffffn).toString(16) : (w >>> 0).toString(16)));
+}
+} catch (e) { say('register dump failed: ' + e); }
+}
+function gdErrStack(what, e, reason) {
+  var msg = what + (reason || '');
+  if (e && e.stack) msg += '\n' + e.stack;
+  else if (reason && reason.stack) msg += '\n' + reason.stack;
+  say(msg);
+  dumpRegs();
+  dumpTrace();
+}
+window.addEventListener('error', function (e) {
+  gdErrStack('ERROR: ', e.error, e.message);
+});
+window.addEventListener('unhandledrejection', function (e) {
+  gdErrStack('REJECT: ', e.reason, e.reason);
+});
+function restoreSaves(then) {
+var called = false;
+function finish() { if (!called) { called = true; then(); } }
+// Wait for saved files before booting the native game.
+try {
+var req = indexedDB.open('gdwasm_saves', 1);
+req.onupgradeneeded = function () { req.result.createObjectStore('files'); };
+req.onerror = function () { say('[persist] idb open failed'); finish(); };
+req.onsuccess = function () {
+var store, keysReq;
+try {
+store = req.result.transaction('files', 'readonly').objectStore('files');
+keysReq = store.getAllKeys();
+} catch (e) { finish(); return; }
+keysReq.onerror = finish;
+keysReq.onsuccess = function () {
+var keys = keysReq.result || [];
+say('[persist] restore: ' + keys.length + ' file(s) in DB' +
+(keys.length ? ': ' + keys.join(', ') : ''));
+if (!keys.length) { finish(); return; }
+var pending = keys.length;
+function one() { if (--pending === 0) finish(); }
+keys.forEach(function (k) {
+var g = store.get(k);
+g.onerror = one;
+g.onsuccess = function () {
+try {
+if (g.result && g.result.byteLength) {
+var s = String(k);
+var base = s.indexOf('AppData/') === 0 ? '/' : '/Resources/';
+var parts = s.split('/'), cur = base.replace(/\/$/, '');
+for (var pi = 0; pi < parts.length - 1; ++pi) {
+cur += '/' + parts[pi];
+try { Module.FS.stat(cur); } catch (e2) { Module.FS.mkdir(cur); }
+}
+Module.FS.writeFile(base + s, new Uint8Array(g.result));
+say('[persist] restored ' + s + ' (' + g.result.byteLength + ' bytes)');
+}
+} catch (e) { say('[persist] restore ' + k + ': ' + e); }
+one();
+};
+});
+};
+};
+} catch (e) { finish(); }
+}
+var Module = {
+canvas: document.getElementById('canvas'),
+gdInputQueue: [],
+gdCursorPos: [0, 0],
+locateFile: function (p) { return p + '?v=' + GD_BUILD_ID; },
+get dataFileDownloads() { return this.__dfd; },
+set dataFileDownloads(v) {
+if (this.__dfd === v) return;
+this.__dfd = new Proxy(v || {}, {
+set: function (t, k, val) {
+t[k] = val;
+try {
+var which = /wasm/i.test(k) ? 'wasm'
+: (/\.data/i.test(k) ? 'data' : null);
+if (which) setAssetBar(which, (val && val.loaded) || 0,
+(val && val.total) || 0);
+} catch (e) {}
+return true;
+}
+});
+},
+instantiateWasm: function (imports, success) {
+return GDAssets.instantiateWasm(imports, success);
+},
+print: function (s) { say(s); },
+printErr: function (s) { say(s); },
+setStatus: function (t) {
+if (!t) return;
+var m = /\((\d+)\/(\d+)\)/.exec(t);
+if (m) {
+var total = +m[2] || 1;
+setProgress(+m[1] / total * 78);
+} else if (t.indexOf('Downloading') === 0) {
+setProgress(4);
+} else if (t.indexOf('Running') === 0) {
+forceAssetsDone();
+setProgress(80);
+} else if (t.indexOf('Compiling') === 0) {
+setProgress(76);
+}
+},
+onRuntimeInitialized: function () {
+window.__gdRuntimeReady = true;
+if (Module._gd_log_set) Module._gd_log_set(GD_DEBUG ? 1 : 0);
+if (/[?&]noauto/.test(location.search) && Module._gd_autosave_set)
+Module._gd_autosave_set(0);
+setProgress(82);
+try {
+Module.FS.chdir('/Resources');
+} catch (e) {
+say('FS.chdir failed: ' + e);
+}
+setTimeout(function () {
+restoreSaves(function () {
+setProgress(88);
+try {
+const r = Module._gd_boot();
+setProgress(92);
+if (r && typeof r.then === 'function') {
+r.then(function () { say('gd_boot resolved'); setProgress(100); })
+.catch(function (e) {
+try {
+var ov = document.getElementById('errOverlay');
+if (ov) {
+ov.textContent = 'The game crashed (' + e + '). Reload the page to ' +
+'keep playing. Open it with ?debug to see logs.';
+ov.classList.add('on');
+}
+} catch (e2) {}
+say('gd_boot rejected: ' + e);
+if (e && e.stack) say('STACK: ' + e.stack);
+dumpRegs();
+dumpTrace();
+});
+} else {
+say('gd_boot returned (sync)');
+setProgress(100);
+}
+} catch (e) {
+say('gd_boot exception: ' + e);
+}
+});
+}, 100);
+}
+};
+var started = false;
+function gdStart() {
+if (started) return;
+try {
+var AC = window.AudioContext || window.webkitAudioContext;
+if (AC && !Module.gdAudioContext) Module.gdAudioContext = new AC({latencyHint:'interactive'});
+if (Module.gdAudioContext) Module.gdAudioContext.resume().catch(function(){});
+} catch (_) {}
+started = true;
+window.__gdLoadStarted = true;
+resetProgress();
+var startEl = document.getElementById('start');
+var flyEl = document.getElementById('logoFly');
+var s = 0.32;
+try {
+var dh = document.querySelector('#logoDock img').getBoundingClientRect().height;
+var fh = flyEl.querySelector('img').getBoundingClientRect().height;
+if (dh > 0 && fh > 0 && dh / fh < 1) s = dh / fh;
+} catch (e) {}
+flyEl.style.transform = 'translateY(-13vh) scale(' + s + ')';
+document.getElementById('loadFly').classList.add('down');
+setTimeout(function () { startEl.classList.add('hide'); }, 420);
+setTimeout(function () { document.getElementById('logoDock').classList.add('in'); }, 420);
+setTimeout(function () { document.getElementById('stage').classList.add('in'); }, 430);
+setTimeout(function () { document.getElementById('midbar').classList.add('in'); }, 480);
+setTimeout(function () { document.getElementById('console').classList.add('in'); }, 540);
+setTimeout(function () {
+startEl.style.display = 'none';
+
+}, 1700);
+function loadModule() {
+GDAssets.loadScript().then(function (code) {
+var s = document.createElement('script');
+s.textContent = code;
+document.body.appendChild(s);
+}).catch(function (e) {
+GDAssets.fail(e);
+});
+}
+loadModule();
+}
+document.getElementById('loadFly').addEventListener('click', gdStart);
+document.getElementById('saveBtn').addEventListener('click', function (e) {
+e.preventDefault(); e.stopPropagation();
+if (!window.__gdRuntimeReady) return;
+scheduleSave(true);
+this.textContent = 'Save requested';
+var button = this; setTimeout(function () { button.textContent = 'Save progress'; }, 3000);
+});
+document.getElementById('clearBtn').addEventListener('click', function (e) {
+e.preventDefault();
+e.stopPropagation();
+gdClearCache();
+});
+document.addEventListener('keydown', function (e) {
+if (!started && (e.code === 'Space' || e.key === ' ' || e.code === 'Enter' ||
+e.key === 'Enter' || e.code === 'NumpadEnter')) {
+e.preventDefault();
+gdStart();
+}
+});</script><script src="gd_input.js?v=355fd7ea115fb3b236d2d6a5"></script><script>(function(){var b=document.getElementById('fsBtn'),d=document,c=document.getElementById('canvas');function F(){return d.fullscreenElement||d.webkitFullscreenElement||d.mozFullScreenElement||d.msFullscreenElement;}function U(){b.textContent=F()?'Exit Fullscreen':'Fullscreen';}function T(){try{if(F()){(d.exitFullscreen||d.webkitExitFullscreen||d.mozCancelFullScreen||d.msExitFullscreen).call(d);}else{(c.requestFullscreen||c.webkitRequestFullscreen||c.mozRequestFullScreen||c.msRequestFullscreen).call(c);}}catch(err){}}b.addEventListener('click',function(v){v.preventDefault();v.stopPropagation();T();b.blur();});['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(function(n){d.addEventListener(n,U);});U();})();</script><script>(function(){
+var ov=document.getElementById('errOverlay');
+function err(m){ if(ov){ov.textContent=m;ov.classList.add('on');} }
+try{
+  var c=document.createElement('canvas');
+  var gl=c.getContext('webgl2');
+  if(!gl) err('WebGL2 not available - use Chrome/Edge 137+ with hardware acceleration.');
+  if(!window.crossOriginIsolated) console.log('[page] note: page is not cross-origin isolated; threads may be limited.');
+  if(typeof WebAssembly.Suspending!=='function'||typeof WebAssembly.promising!=='function') err('This game needs a browser with WebAssembly JSPI support. Update Chrome or Edge.');
+  if(gl){var lose=gl.getExtension('WEBGL_lose_context');if(lose)lose.loseContext();}
+}catch(e){ err('Feature check failed: '+e); }
+window.addEventListener('error',function(e){ if(e&&e.message&&/JSPI|WebAssembly|wasm|memory/i.test(String(e.message))) err('Runtime error: '+e.message); });
+})();</script>
+
+<span id="credit">Native WASM runtime by Bog · Local package</span></body></html>

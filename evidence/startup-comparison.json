@@ -1,0 +1,80 @@
+{
+  "profiles": {
+    "baseline": "C:\\Users\\Matty\\Documents\\Codex\\2026-11-05\\i-hav\\work\\cache-profile-1794084676643-baseline",
+    "native": "C:\\Users\\Matty\\Documents\\Codex\\2026-11-05\\i-hav\\work\\cache-profile-1794084676643-native"
+  },
+  "results": [
+    {
+      "variant": "baseline",
+      "trial": 0,
+      "firstFrameMs": 4771,
+      "menuMs": 9594,
+      "resources": [],
+      "errors": []
+    },
+    {
+      "variant": "native",
+      "trial": 0,
+      "firstFrameMs": 4942,
+      "menuMs": 9810,
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4175/engine/523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a.wasm",
+          "transfer": 28825086,
+          "encoded": 28824786,
+          "decoded": 123481510,
+          "duration": 627.4000000953674
+        }
+      ],
+      "errors": []
+    },
+    {
+      "variant": "native",
+      "trial": 1,
+      "firstFrameMs": 2599,
+      "menuMs": 6971,
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4175/engine/523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a.wasm",
+          "transfer": 0,
+          "encoded": 28824786,
+          "decoded": 123481510,
+          "duration": 504
+        }
+      ],
+      "errors": []
+    },
+    {
+      "variant": "baseline",
+      "trial": 1,
+      "firstFrameMs": 3251,
+      "menuMs": 8140,
+      "resources": [],
+      "errors": []
+    },
+    {
+      "variant": "baseline",
+      "trial": 2,
+      "firstFrameMs": 3048,
+      "menuMs": 7906,
+      "resources": [],
+      "errors": []
+    },
+    {
+      "variant": "native",
+      "trial": 2,
+      "firstFrameMs": 2635,
+      "menuMs": 7008,
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4175/engine/523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a.wasm",
+          "transfer": 0,
+          "encoded": 28824786,
+          "decoded": 123481510,
+          "duration": 526.7999999523163
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

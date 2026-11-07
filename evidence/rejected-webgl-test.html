@@ -1,0 +1,134 @@
+<!doctype html><meta charset="utf-8"><title>Native WebGL bridge checks</title><style>body{font:16px system-ui;margin:30px;background:#101b29;color:#d8f1ff}pre{white-space:pre-wrap}</style><h1>WebGL bridge differential test</h1><pre id="result">Running…</pre><script>try{const run=({baseline, optimized}) => {
+      function check(ok, message) { if (!ok) throw Error(message); }
+      function same(a, b) { return a.length === b.length && a.every((n, i) => n === b[i]); }
+      function run(code) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 64;
+        const gl = canvas.getContext('webgl2', {antialias: false, preserveDrawingBuffer: true});
+        check(gl, 'WebGL2 is required');
+        const heap = new ArrayBuffer(65536), HEAPU8 = new Uint8Array(heap), HEAPF32 = new Float32Array(heap);
+        const calls = {viewUploads: 0, rangeUploads: 0, copiedMatrixFloats: 0, rangeMatrixFloats: 0};
+        for (const name of ['bufferData', 'bufferSubData', 'compressedTexImage2D']) {
+          const original = gl[name].bind(gl);
+          gl[name] = (...args) => {
+            if (args.some(a => a === HEAPU8)) calls.rangeUploads++;
+            else if (args.some(a => ArrayBuffer.isView(a))) calls.viewUploads++;
+            return original(...args);
+          };
+        }
+        const matrixUpload = gl.uniformMatrix4fv.bind(gl);
+        gl.uniformMatrix4fv = (...args) => {
+          if (args[2] === HEAPF32 && args.length === 5) calls.rangeMatrixFloats += args[4];
+          else if (args[2]) calls.copiedMatrixFloats += args[2].length;
+          return matrixUpload(...args);
+        };
+        function shader(type, text) {
+          const s = gl.createShader(type); gl.shaderSource(s, text); gl.compileShader(s);
+          check(gl.getShaderParameter(s, gl.COMPILE_STATUS), gl.getShaderInfoLog(s)); return s;
+        }
+        const program = gl.createProgram();
+        gl.attachShader(program, shader(gl.VERTEX_SHADER, `#version 300 es
+          layout(location=0) in vec2 aPosition; uniform mat4 uMatrix[20]; out vec2 uv;
+          void main(){ vec4 p=vec4(0); for(int i=0;i<20;i++) p+=uMatrix[i]*vec4(aPosition,0,1); gl_Position=p/20.; uv=aPosition*.5+.5; }`));
+        gl.attachShader(program, shader(gl.FRAGMENT_SHADER, `#version 300 es
+          precision highp float; in vec2 uv; uniform vec4 uColor; uniform sampler2D uTexture; uniform bool uTextured; out vec4 color;
+          void main(){ color=uTextured?texture(uTexture,uv):uColor; }`));
+        gl.linkProgram(program); check(gl.getProgramParameter(program, gl.LINK_STATUS), gl.getProgramInfoLog(program));
+        gl.useProgram(program);
+        const location = gl.getUniformLocation(program, 'uMatrix[0]');
+        gl.uniform4f(gl.getUniformLocation(program, 'uColor'), .2, .7, .9, 1);
+        const uniform = name => gl.getUniformLocation(program, name);
+        const temp = new Float32Array(288), miniTempWebGLFloatBuffers = Array.from({length: 289}, (_, n) => temp.subarray(0, n));
+        const GL = {
+          currentContext: {maxVertexAttribs: 1, clientBuffers: [{clientside: false, enabled: true}]},
+          calcBufLength: (size, type, stride, count) => stride > 0 ? stride * count : size * ({5121: 1, 5123: 2, 5125: 4, 5126: 4}[type]) * count,
+          recordError: e => { throw Error(`Unexpected bridge error ${e}`); },
+          postDrawHandleClientVertexAttribBindings: () => {},
+        };
+        const build = new Function('GLctx', 'HEAPU8', 'HEAPF32', 'GL', 'webglGetUniformLocation', 'miniTempWebGLFloatBuffers',
+          Object.values(code).filter(s => s.startsWith('function ')).join('\n') +
+          `\nreturn {${Object.keys(code).filter(k => k !== 'preDraw').join(',')},preDraw:${code.preDraw}};`);
+        const api = build(gl, HEAPU8, HEAPF32, GL, () => location, miniTempWebGLFloatBuffers);
+        GL.preDrawHandleClientVertexAttribBindings = () => {};
+        const pictures = [], errors = [], records = [];
+        function recordError(label) { errors.push([label, gl.getError()]); }
+        function picture(label) {
+          const pixels = new Uint8Array(64 * 64 * 4); gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+          pictures.push([label, Array.from(pixels)]); recordError(label);
+        }
+        const identity = () => {
+          const m = new Float32Array(20 * 16);
+          for (let i = 0; i < 20; i++) m.set([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1], i * 16);
+          matrixUpload(location, false, m); return m;
+        };
+        identity();
+        HEAPF32.set([-.8,-.8,.8,-.8,0,.8], 128);
+        const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        api._glBufferData(gl.ARRAY_BUFFER, 24, 512, gl.DYNAMIC_DRAW);
+        const uploaded = new Uint8Array(24); gl.getBufferSubData(gl.ARRAY_BUFFER, 0, uploaded);
+        check(same(uploaded, HEAPU8.slice(512, 536)), 'bufferData contents');
+        gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 8, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3); picture('bufferData');
+        const emptyCheck = uploaded.slice();
+        api._glBufferSubData(gl.ARRAY_BUFFER, 0, 0, 800);
+        gl.getBufferSubData(gl.ARRAY_BUFFER, 0, uploaded);
+        check(same(uploaded, emptyCheck), 'zero bufferSubData must not overwrite'); recordError('zero bufferSubData');
+        HEAPF32.set([-.5,-.8,.8,-.8,0,.8], 128);
+        api._glBufferSubData(gl.ARRAY_BUFFER, 0, 24, 512);
+        gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3); picture('bufferSubData');
+        api._glBufferData(gl.ARRAY_BUFFER, 0, 512, gl.DYNAMIC_DRAW);
+        records.push(['zeroBufferSize', gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE)]); recordError('zero bufferData');
+        api._glBufferData(gl.ARRAY_BUFFER, 24, 512, gl.DYNAMIC_DRAW);
+        // Deliberately clipped range exercises the exact legacy fallback.
+        api._glBufferSubData(gl.ARRAY_BUFFER, 0, 32, HEAPU8.length - 8);
+        recordError('clipped bufferSubData');
+        api._glBufferSubData(gl.ARRAY_BUFFER, 0, 24, 512);
+        for (const count of [1, 2, 18, 19]) {
+          const matrices = identity();
+          matrices[12] = .35;
+          HEAPF32.set(matrices, 256);
+          api._glUniformMatrix4fv(1, count, 0, 1024);
+          gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3); picture(`matrix${count}`);
+        }
+        const before = Array.from(gl.getUniform(program, location));
+        HEAPF32.fill(0, 256, 256 + 16);
+        api._glUniformMatrix4fv(1, 0, 0, 1024);
+        check(same(before, Array.from(gl.getUniform(program, location))), 'zero matrix count must not overwrite'); recordError('zero matrices');
+        api._glUniformMatrix4fv(1, 1, 1, 1024); recordError('invalid transpose');
+        api._glUniformMatrix4fv(1, 1, 0, HEAPU8.length - 4); recordError('clipped matrix fallback');
+        identity();
+        const clientBuffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, clientBuffer); gl.bufferData(gl.ARRAY_BUFFER, 64, gl.DYNAMIC_DRAW);
+        GL.getTempVertexBuffer = () => clientBuffer;
+        GL.currentContext.clientBuffers[0] = {clientside: true, enabled: true, size: 2, type: gl.FLOAT, stride: 8, ptr: 512, normalized: false, vertexAttribPointerAdaptor: gl.vertexAttribPointer};
+        api.preDraw(3); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3); picture('client vertices');
+        GL.currentContext.clientBuffers[0].clientside = false;
+        const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, 64, gl.DYNAMIC_DRAW);
+        GL.getTempIndexBuffer = () => ibo;
+        new Uint16Array(heap).set([0, 1, 2], 400);
+        gl.currentElementArrayBufferBinding = 0;
+        gl.clear(gl.COLOR_BUFFER_BIT); api._glDrawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 800); picture('client indices');
+        api._glDrawElements(gl.TRIANGLES, 0, gl.UNSIGNED_SHORT, 800); recordError('zero client indices');
+        const texture = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        const etc = gl.getExtension('WEBGL_compressed_texture_etc');
+        check(etc, 'ETC2 compression extension is required for the compressed-upload check');
+        HEAPU8.set([0,0,0,0,0,0,0,0], 900);
+        gl.currentPixelUnpackBufferBinding = 0;
+        api._glCompressedTexImage2D(gl.TEXTURE_2D, 0, etc.COMPRESSED_RGB8_ETC2, 4, 4, 0, 8, 900);
+        gl.uniform1i(uniform('uTextured'), 1);
+        gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3); picture('compressed ETC2 texture');
+        api._glCompressedTexImage2D(gl.TEXTURE_2D, 0, etc.COMPRESSED_RGB8_ETC2, 4, 4, 0, 0, 900); recordError('zero compressed fallback');
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
+        return {pictures, records, errors, calls};
+      }
+      const original = run(baseline), candidate = run(optimized);
+      check(JSON.stringify(original.pictures) === JSON.stringify(candidate.pictures), 'Pixel output differs');
+      check(JSON.stringify(original.records) === JSON.stringify(candidate.records), 'GL state differs');
+      check(JSON.stringify(original.errors) === JSON.stringify(candidate.errors), 'GL errors differ');
+      check(original.pictures.every(([, pixels]) => pixels.some(v => v !== 0)), 'Rendering must produce pixels');
+      for (const [name, error] of original.errors) {
+        if (!name.startsWith('zero ')) check(error === 0, `Unexpected GL error in valid case ${name}: ${error}`);
+      }
+      return {pixelComparisons: original.pictures.length, cases: original.pictures.map(([name]) => name), errors: original.errors, baseline: original.calls, optimized: candidate.calls};
+    };const result=run({"baseline":{"_glBufferData":"function _glBufferData(target, size, data, usage) {\n  size >>>= 0;\n  data >>>= 0;\n  // N.b. here first form specifies a heap subarray, second form an integer\n  // size, so the ?: code here is polymorphic. It is advised to avoid\n  // randomly mixing both uses in calling code, to avoid any potential JS\n  // engine JIT issues.\n  GLctx.bufferData(target, data ? HEAPU8.subarray(data >>> 0, data + size >>> 0) : size, usage);\n}","_glBufferSubData":"function _glBufferSubData(target, offset, size, data) {\n  offset >>>= 0;\n  size >>>= 0;\n  data >>>= 0;\n  GLctx.bufferSubData(target, offset, HEAPU8.subarray(data >>> 0, data + size >>> 0));\n}","_glCompressedTexImage2D":"function _glCompressedTexImage2D(target, level, internalFormat, width, height, border, imageSize, data) {\n  data >>>= 0;\n  // `data` may be null here, which means \"allocate uniniitalized space but\n  // don't upload\" in GLES parlance, but `compressedTexImage2D` requires the\n  // final data parameter, so we simply pass a heap view starting at zero\n  // effectively uploading whatever happens to be near address zero.  See\n  // https://github.com/emscripten-core/emscripten/issues/19300.\n  if (true) {\n    if (GLctx.currentPixelUnpackBufferBinding || !imageSize) {\n      GLctx.compressedTexImage2D(target, level, internalFormat, width, height, border, imageSize, data);\n      return;\n    }\n  }\n  GLctx.compressedTexImage2D(target, level, internalFormat, width, height, border, HEAPU8.subarray((data) >>> 0, data + imageSize >>> 0));\n}","_glUniformMatrix4fv":"function _glUniformMatrix4fv(location, count, transpose, value) {\n  value >>>= 0;\n  if (count \u003c= 18) {\n    // avoid allocation when uploading few enough uniforms\n    var view = miniTempWebGLFloatBuffers[16 * count];\n    // hoist the heap out of the loop for size and for pthreads+growth.\n    var heap = HEAPF32;\n    value = ((value) >>> 2);\n    count *= 16;\n    for (var i = 0; i \u003c count; i += 16) {\n      var dst = value + i;\n      view[i] = heap[dst >>> 0];\n      view[i + 1] = heap[dst + 1 >>> 0];\n      view[i + 2] = heap[dst + 2 >>> 0];\n      view[i + 3] = heap[dst + 3 >>> 0];\n      view[i + 4] = heap[dst + 4 >>> 0];\n      view[i + 5] = heap[dst + 5 >>> 0];\n      view[i + 6] = heap[dst + 6 >>> 0];\n      view[i + 7] = heap[dst + 7 >>> 0];\n      view[i + 8] = heap[dst + 8 >>> 0];\n      view[i + 9] = heap[dst + 9 >>> 0];\n      view[i + 10] = heap[dst + 10 >>> 0];\n      view[i + 11] = heap[dst + 11 >>> 0];\n      view[i + 12] = heap[dst + 12 >>> 0];\n      view[i + 13] = heap[dst + 13 >>> 0];\n      view[i + 14] = heap[dst + 14 >>> 0];\n      view[i + 15] = heap[dst + 15 >>> 0];\n    }\n  } else {\n    var view = HEAPF32.subarray((((value) >>> 2)) >>> 0, ((value + count * 64) >>> 2) >>> 0);\n  }\n  GLctx.uniformMatrix4fv(webglGetUniformLocation(location), !!transpose, view);\n}","_glDrawElements":"function _glDrawElements(mode, count, type, indices) {\n  indices >>>= 0;\n  var buf;\n  var vertexes = 0;\n  if (!GLctx.currentElementArrayBufferBinding) {\n    var size = GL.calcBufLength(1, type, 0, count);\n    buf = GL.getTempIndexBuffer(size);\n    GLctx.bindBuffer(34963, buf);\n    GLctx.bufferSubData(34963, 0, HEAPU8.subarray(indices >>> 0, indices + size >>> 0));\n    // Calculating vertex count if shader's attribute data is on client side\n    if (count > 0) {\n      for (var i = 0; i \u003c GL.currentContext.maxVertexAttribs; ++i) {\n        var cb = GL.currentContext.clientBuffers[i];\n        if (cb.clientside && cb.enabled) {\n          let arrayClass;\n          switch (type) {\n           case 5121:\n            arrayClass = Uint8Array;\n            break;\n\n           case 5123:\n            arrayClass = Uint16Array;\n            break;\n\n           case 5125:\n            arrayClass = Uint32Array;\n            break;\n\n           default:\n            GL.recordError(1282);\n            return;\n          }\n          vertexes = new arrayClass(HEAPU8.buffer, indices, count).reduce((max, current) => Math.max(max, current)) + 1;\n          break;\n        }\n      }\n    }\n    // the index is now 0\n    indices = 0;\n  }\n  // bind any client-side buffers\n  GL.preDrawHandleClientVertexAttribBindings(vertexes);\n  GLctx.drawElements(mode, count, type, indices);\n  GL.postDrawHandleClientVertexAttribBindings(count);\n  if (!GLctx.currentElementArrayBufferBinding) {\n    GLctx.bindBuffer(34963, null);\n  }\n}","preDraw":"count => {\n    GL.resetBufferBinding = false;\n    // TODO: initial pass to detect ranges we need to upload, might not need\n    // an upload per attrib\n    for (var i = 0; i \u003c GL.currentContext.maxVertexAttribs; ++i) {\n      var cb = GL.currentContext.clientBuffers[i];\n      if (!cb.clientside || !cb.enabled) continue;\n      GL.resetBufferBinding = true;\n      var size = GL.calcBufLength(cb.size, cb.type, cb.stride, count);\n      var buf = GL.getTempVertexBuffer(size);\n      GLctx.bindBuffer(34962, buf);\n      GLctx.bufferSubData(34962, 0, HEAPU8.subarray(cb.ptr >>> 0, cb.ptr + size >>> 0));\n      cb.vertexAttribPointerAdaptor.call(GLctx, i, cb.size, cb.type, cb.normalized, cb.stride, 0);\n    }\n  }"},"optimized":{"_glBufferData":"function _glBufferData(target, size, data, usage) {\n  size >>>= 0;\n  data >>>= 0;\n  // N.b. here first form specifies a heap subarray, second form an integer\n  // size, so the ?: code here is polymorphic. It is advised to avoid\n  // randomly mixing both uses in calling code, to avoid any potential JS\n  // engine JIT issues.\n  if (data && size > 0 && data + size \u003c= HEAPU8.length)\n    GLctx.bufferData(target, HEAPU8, usage, data, size);\n  else GLctx.bufferData(target, data ? HEAPU8.subarray(data >>> 0, data + size >>> 0) : size, usage);\n}","_glBufferSubData":"function _glBufferSubData(target, offset, size, data) {\n  offset >>>= 0;\n  size >>>= 0;\n  data >>>= 0;\n  if (size > 0 && data + size \u003c= HEAPU8.length)\n    GLctx.bufferSubData(target, offset, HEAPU8, data, size);\n  else GLctx.bufferSubData(target, offset, HEAPU8.subarray(data >>> 0, data + size >>> 0));\n}","_glCompressedTexImage2D":"function _glCompressedTexImage2D(target, level, internalFormat, width, height, border, imageSize, data) {\n  data >>>= 0;\n  // `data` may be null here, which means \"allocate uniniitalized space but\n  // don't upload\" in GLES parlance, but `compressedTexImage2D` requires the\n  // final data parameter, so we simply pass a heap view starting at zero\n  // effectively uploading whatever happens to be near address zero.  See\n  // https://github.com/emscripten-core/emscripten/issues/19300.\n  if (true) {\n    if (GLctx.currentPixelUnpackBufferBinding || !imageSize) {\n      GLctx.compressedTexImage2D(target, level, internalFormat, width, height, border, imageSize, data);\n      return;\n    }\n  }\n  if (imageSize > 0 && data + imageSize \u003c= HEAPU8.length)\n    GLctx.compressedTexImage2D(target, level, internalFormat, width, height, border, HEAPU8, data, imageSize);\n  else GLctx.compressedTexImage2D(target, level, internalFormat, width, height, border, HEAPU8.subarray((data) >>> 0, data + imageSize >>> 0));\n}","_glUniformMatrix4fv":"function _glUniformMatrix4fv(location, count, transpose, value) {\n  value >>>= 0;\n  // WebGL2 accepts a heap range directly; retain the old zero/invalid-range behavior below.\n  if (count > 0 && count * 16 \u003c= HEAPF32.length - (value >>> 2)) {\n    GLctx.uniformMatrix4fv(webglGetUniformLocation(location), !!transpose, HEAPF32, value >>> 2, count * 16);\n    return;\n  }\n  if (count \u003c= 18) {\n    // avoid allocation when uploading few enough uniforms\n    var view = miniTempWebGLFloatBuffers[16 * count];\n    // hoist the heap out of the loop for size and for pthreads+growth.\n    var heap = HEAPF32;\n    value = ((value) >>> 2);\n    count *= 16;\n    for (var i = 0; i \u003c count; i += 16) {\n      var dst = value + i;\n      view[i] = heap[dst >>> 0];\n      view[i + 1] = heap[dst + 1 >>> 0];\n      view[i + 2] = heap[dst + 2 >>> 0];\n      view[i + 3] = heap[dst + 3 >>> 0];\n      view[i + 4] = heap[dst + 4 >>> 0];\n      view[i + 5] = heap[dst + 5 >>> 0];\n      view[i + 6] = heap[dst + 6 >>> 0];\n      view[i + 7] = heap[dst + 7 >>> 0];\n      view[i + 8] = heap[dst + 8 >>> 0];\n      view[i + 9] = heap[dst + 9 >>> 0];\n      view[i + 10] = heap[dst + 10 >>> 0];\n      view[i + 11] = heap[dst + 11 >>> 0];\n      view[i + 12] = heap[dst + 12 >>> 0];\n      view[i + 13] = heap[dst + 13 >>> 0];\n      view[i + 14] = heap[dst + 14 >>> 0];\n      view[i + 15] = heap[dst + 15 >>> 0];\n    }\n  } else {\n    var view = HEAPF32.subarray((((value) >>> 2)) >>> 0, ((value + count * 64) >>> 2) >>> 0);\n  }\n  GLctx.uniformMatrix4fv(webglGetUniformLocation(location), !!transpose, view);\n}","_glDrawElements":"function _glDrawElements(mode, count, type, indices) {\n  indices >>>= 0;\n  var buf;\n  var vertexes = 0;\n  if (!GLctx.currentElementArrayBufferBinding) {\n    var size = GL.calcBufLength(1, type, 0, count);\n    buf = GL.getTempIndexBuffer(size);\n    GLctx.bindBuffer(34963, buf);\n    if (size > 0 && indices + size \u003c= HEAPU8.length)\n      GLctx.bufferSubData(34963, 0, HEAPU8, indices, size);\n    else GLctx.bufferSubData(34963, 0, HEAPU8.subarray(indices >>> 0, indices + size >>> 0));\n    // Calculating vertex count if shader's attribute data is on client side\n    if (count > 0) {\n      for (var i = 0; i \u003c GL.currentContext.maxVertexAttribs; ++i) {\n        var cb = GL.currentContext.clientBuffers[i];\n        if (cb.clientside && cb.enabled) {\n          let arrayClass;\n          switch (type) {\n           case 5121:\n            arrayClass = Uint8Array;\n            break;\n\n           case 5123:\n            arrayClass = Uint16Array;\n            break;\n\n           case 5125:\n            arrayClass = Uint32Array;\n            break;\n\n           default:\n            GL.recordError(1282);\n            return;\n          }\n          vertexes = new arrayClass(HEAPU8.buffer, indices, count).reduce((max, current) => Math.max(max, current)) + 1;\n          break;\n        }\n      }\n    }\n    // the index is now 0\n    indices = 0;\n  }\n  // bind any client-side buffers\n  GL.preDrawHandleClientVertexAttribBindings(vertexes);\n  GLctx.drawElements(mode, count, type, indices);\n  GL.postDrawHandleClientVertexAttribBindings(count);\n  if (!GLctx.currentElementArrayBufferBinding) {\n    GLctx.bindBuffer(34963, null);\n  }\n}","preDraw":"count => {\n    GL.resetBufferBinding = false;\n    // TODO: initial pass to detect ranges we need to upload, might not need\n    // an upload per attrib\n    for (var i = 0; i \u003c GL.currentContext.maxVertexAttribs; ++i) {\n      var cb = GL.currentContext.clientBuffers[i];\n      if (!cb.clientside || !cb.enabled) continue;\n      GL.resetBufferBinding = true;\n      var size = GL.calcBufLength(cb.size, cb.type, cb.stride, count);\n      var buf = GL.getTempVertexBuffer(size);\n      GLctx.bindBuffer(34962, buf);\n      if (size > 0 && (cb.ptr >>> 0) + size \u003c= HEAPU8.length)\n        GLctx.bufferSubData(34962, 0, HEAPU8, cb.ptr >>> 0, size);\n      else GLctx.bufferSubData(34962, 0, HEAPU8.subarray(cb.ptr >>> 0, cb.ptr + size >>> 0));\n      cb.vertexAttribPointerAdaptor.call(GLctx, i, cb.size, cb.type, cb.normalized, cb.stride, 0);\n    }\n  }"}});if(!(result.optimized.rangeUploads>0&&result.optimized.viewUploads<result.baseline.viewUploads&&result.optimized.copiedMatrixFloats===16))throw Error('Upload optimization was not exercised');document.getElementById('result').textContent='PASS
+'+JSON.stringify(result,null,2);}catch(error){document.getElementById('result').textContent='FAIL: '+error.message;console.error(error);}</script>

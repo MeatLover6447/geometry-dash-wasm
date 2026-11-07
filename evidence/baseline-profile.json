@@ -1,0 +1,177 @@
+{
+  "variant": "baseline",
+  "bootMs": 4562,
+  "benchmark": {
+    "running": false,
+    "frames": 601,
+    "elapsedMs": 10007.399999856949,
+    "meanFps": 60.055558887282515,
+    "frameP95Ms": 17.899999856948853,
+    "frameMaxMs": 22.800000190734863,
+    "inputP95Ms": null,
+    "heapMiB": 909.625
+  },
+  "glCalls": {
+    "_glBufferSubData": 3165,
+    "_glUniformMatrix4fv": 11487,
+    "_glBufferData": 48,
+    "_glUniform4fv": 392
+  },
+  "heapMiB": 909.625,
+  "error": "",
+  "taskMs": 5824.329000000001,
+  "scriptMs": 23.761999999999997,
+  "errors": [],
+  "hot": [
+    {
+      "name": "(idle)",
+      "url": "",
+      "line": -1,
+      "samples": 3428
+    },
+    {
+      "name": "(program)",
+      "url": "",
+      "line": -1,
+      "samples": 2568
+    },
+    {
+      "name": "wasm-function[1609]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 22
+    },
+    {
+      "name": "wasm-function[1119]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 19
+    },
+    {
+      "name": "wasm-function[14895]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 16
+    },
+    {
+      "name": "wasm-function[15039]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 13
+    },
+    {
+      "name": "bufferSubData",
+      "url": "",
+      "line": -1,
+      "samples": 12
+    },
+    {
+      "name": "wasm-function[2580]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 12
+    },
+    {
+      "name": "wasm-function[2741]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 11
+    },
+    {
+      "name": "setTimeout",
+      "url": "",
+      "line": -1,
+      "samples": 9
+    },
+    {
+      "name": "wasm-function[1391]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 8
+    },
+    {
+      "name": "wasm-function[10275]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 8
+    },
+    {
+      "name": "wasm-function[15039]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 8
+    },
+    {
+      "name": "clear",
+      "url": "",
+      "line": -1,
+      "samples": 8
+    },
+    {
+      "name": "bufferSubData",
+      "url": "",
+      "line": -1,
+      "samples": 7
+    },
+    {
+      "name": "wasm-function[9238]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 6
+    },
+    {
+      "name": "wasm-function[7763]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 6
+    },
+    {
+      "name": "wasm-function[24574]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 5
+    },
+    {
+      "name": "wasm-function[9235]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 5
+    },
+    {
+      "name": "Module.gdMeasureFrame",
+      "url": "http://127.0.0.1:4174/gd_input.js?v=9274beaaad27e3fbd46ebce7",
+      "line": 53,
+      "samples": 5
+    },
+    {
+      "name": "wasm-function[13404]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 5
+    },
+    {
+      "name": "wasm-function[24574]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 4
+    },
+    {
+      "name": "wasm-function[13463]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 4
+    },
+    {
+      "name": "wasm-function[12091]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 4
+    },
+    {
+      "name": "wasm-function[24574]",
+      "url": "wasm://wasm/1d70b69a",
+      "line": 0,
+      "samples": 4
+    }
+  ]
+}

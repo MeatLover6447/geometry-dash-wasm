@@ -1,0 +1,10 @@
+{
+  "frames": 18434,
+  "error": "The game crashed (RuntimeError: Aborted(native code called abort())). Reload the page to keep playing. Open it with ?debug to see logs.",
+  "savedBytes": [
+    3588,
+    388,
+    2304
+  ],
+  "errors": []
+}

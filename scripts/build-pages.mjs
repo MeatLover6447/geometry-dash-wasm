@@ -1,0 +1,26 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import {createGunzip} from 'node:zlib';
+import {pipeline} from 'node:stream/promises';
+import assert from 'node:assert/strict';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const output=path.join(root,'pages');
+fs.mkdirSync(output,{recursive:true});
+fs.cpSync(path.join(root,'dist'),output,{recursive:true});
+const manifest=JSON.parse(fs.readFileSync(path.join(output,'gd_assets.json'),'utf8'));
+const previous=manifest.build;
+const nativeUrl=`engine/${manifest.wasm.sha256}.wasm`;
+fs.mkdirSync(path.join(output,'engine'),{recursive:true});
+await pipeline(fs.createReadStream(path.join(output,manifest.wasm.url)),createGunzip(),fs.createWriteStream(path.join(output,nativeUrl)));
+const digest=createHash('sha256');let bytes=0;
+for await(const chunk of fs.createReadStream(path.join(output,nativeUrl))){digest.update(chunk);bytes+=chunk.length;}
+assert.equal(bytes,manifest.wasm.size);assert.equal(digest.digest('hex'),manifest.wasm.sha256,'Original native WASM integrity');
+manifest.wasm.nativeUrl=nativeUrl;
+manifest.build=createHash('sha256').update(JSON.stringify({...manifest,build:undefined})).digest('hex').slice(0,24);
+fs.writeFileSync(path.join(output,'gd_assets.json'),JSON.stringify(manifest));
+const index=path.join(output,'index.html');
+fs.writeFileSync(index,fs.readFileSync(index,'utf8').replaceAll(previous,manifest.build).replace('Native WASM runtime by Bog · Local package','Native WASM runtime by Bog · GitHub Pages: online services unavailable'));
+fs.writeFileSync(path.join(output,'.nojekyll'),'');
+console.log(`Pages ready: ${output}; native engine verified; all compressed assets retained.`);
