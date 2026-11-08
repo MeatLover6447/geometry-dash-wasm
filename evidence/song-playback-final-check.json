@@ -1,0 +1,110 @@
+{
+  "error": "",
+  "ctx": "running",
+  "master": 1,
+  "files": [
+    ".",
+    "..",
+    "10013017.ogg",
+    "CCGameManager.dat",
+    "CCLocalLevels.dat"
+  ],
+  "sounds": [
+    {
+      "id": 14,
+      "path": "C:\\\\10013017.ogg",
+      "state": 1,
+      "len": 217726,
+      "duration": 217.72625,
+      "candidates": [
+        "C://10013017.ogg",
+        "/10013017.ogg",
+        "/AppData/10013017.ogg",
+        "/Resources//10013017.ogg",
+        "Resources//10013017.ogg",
+        "//10013017.ogg",
+        "/Resources/10013017.ogg",
+        "Resources/10013017.ogg",
+        "10013017.ogg",
+        "/Resources/songs/10013017.ogg",
+        "/Resources/sfx/10013017.ogg",
+        "/Resources/random_sounds/10013017.ogg"
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "id": 15,
+      "sound": 14,
+      "src": true,
+      "paused": false,
+      "pausedByGroup": false,
+      "ended": 0,
+      "volume": 1,
+      "gain": 1,
+      "group": 1
+    }
+  ],
+  "logs": [
+    "[audio-js] unlock -> state=running",
+    "[audio-js] grpstop grp=1",
+    "[audio-js] play snd=6 ch=13 ready=1 paused=true ctx=running",
+    "[audio-js] chvol ch=13 -> 0.30000001192092896",
+    "[audio-js] source started ch=13 off=0.00 dur=1.29 gain=0.30000001192092896 master=1 ctx=running",
+    "[audio-js] resume ch=13 at 0",
+    "[audio-js] play snd=14 ch=15 ready=0 paused=true ctx=running",
+    "[audio-js] chvol ch=15 -> 1",
+    "[audio-js] chvol ch=15 -> 1",
+    "[audio-js] chvol ch=15 -> 1",
+    "[audio-js] source started ch=15 off=0.00 dur=217.73 gain=1 master=1 ctx=running",
+    "[audio-js] resume ch=15 at 0"
+  ],
+  "diagnostics": [
+    {
+      "path": "/AppData/10013017.ogg",
+      "bytes": 7060155,
+      "magic": [
+        79,
+        103,
+        103,
+        83,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 217.72625,
+      "channels": 2,
+      "sampleRate": 48000,
+      "rms15to20s": 0.083101780835234
+    },
+    {
+      "path": "/Resources/songs/10013017.ogg",
+      "error": "ErrnoError: No such file or directory"
+    },
+    {
+      "path": "/Resources/10013017.ogg",
+      "error": "ErrnoError: No such file or directory"
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://www.boomlings.com/database/getCustomContentURL.php",
+      "status": 200
+    },
+    {
+      "url": "https://geometrydashfiles.b-cdn.net/news/news_version.txt",
+      "status": 200
+    },
+    {
+      "url": "https://www.boomlings.com/database/getGJContentStatus.php",
+      "status": 200
+    }
+  ],
+  "build": "00be722cca1c758b46070f3f",
+  "runtimePatchedInBrowser": false
+}

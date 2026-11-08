@@ -1,0 +1,129 @@
+{
+  "songId": 10013017,
+  "environment": "Headless Chromium, native game UI at http://127.0.0.1:4174/?perf",
+  "runtimeBuild": "a0e2c63477aa947bb76f0c84",
+  "testScope": "AppData-only built runtime plus a temporary browser-only candidate wrapper using a backslash-aware basename. Final production normalization patch is owned and verified separately by the parent.",
+  "download": {
+    "nativeUi": "Download complete",
+    "source": "https://geometrydashfiles.b-cdn.net/music/10013017.ogg",
+    "status": 200,
+    "persistedAcrossBrowserRestart": true
+  },
+  "filesystemAndDecode": [
+    {
+      "path": "/AppData/10013017.ogg",
+      "bytes": 7060155,
+      "magic": [
+        79,
+        103,
+        103,
+        83,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 217.72625,
+      "channels": 2,
+      "sampleRate": 48000,
+      "rms15to20s": 0.083101780835234
+    },
+    {
+      "path": "/Resources/songs/10013017.ogg",
+      "error": "ErrnoError: No such file or directory"
+    },
+    {
+      "path": "/Resources/10013017.ogg",
+      "error": "ErrnoError: No such file or directory"
+    }
+  ],
+  "beforeObserved": {
+    "path": "C:\\\\10013017.ogg",
+    "state": 2,
+    "len": 0,
+    "reason": "Upstream path regex did not split Windows backslashes; AppData candidate retained C: and backslashes instead of the filename."
+  },
+  "directPlayback": {
+    "id": 19,
+    "path": "C:\\\\10013017.ogg",
+    "state": 1,
+    "len": 217726,
+    "duration": 217.72625,
+    "channel": 20,
+    "src": true,
+    "ctx": "running",
+    "gain": 1,
+    "master": 1
+  },
+  "nativeLevelPlayback": {
+    "sound": {
+      "id": 25,
+      "path": "C:\\\\10013017.ogg",
+      "state": 1,
+      "len": 217726,
+      "duration": 217.72625,
+      "candidates": [
+        "/AppData/10013017.ogg",
+        "C:\\\\10013017.ogg",
+        "/AppData/C:\\\\10013017.ogg",
+        "/Resources/C:\\\\10013017.ogg",
+        "Resources/C:\\\\10013017.ogg",
+        "/C:\\\\10013017.ogg",
+        "/Resources/songs/C:\\\\10013017.ogg",
+        "/Resources/sfx/C:\\\\10013017.ogg",
+        "/Resources/random_sounds/C:\\\\10013017.ogg"
+      ]
+    },
+    "channel": {
+      "id": 26,
+      "sound": 25,
+      "src": true,
+      "paused": false,
+      "pausedByGroup": false,
+      "ended": 0,
+      "volume": 1,
+      "gain": 1,
+      "group": 1
+    },
+    "contextState": "running",
+    "masterGain": 1
+  },
+  "relevantLogs": [
+    "[audio-js] chvol ch=16 -> 1",
+    "[audio-js] source started ch=16 off=0.00 dur=4.34 gain=1 master=1 ctx=running",
+    "[audio-js] resume ch=16 at 0",
+    "[audio-js] play snd=17 ch=18 ready=1 paused=false ctx=running",
+    "[audio-js] source started ch=18 off=0.00 dur=217.73 gain=1 master=1 ctx=running",
+    "[audio-js] play snd=19 ch=20 ready=1 paused=false ctx=running",
+    "[audio-js] source started ch=20 off=0.00 dur=217.73 gain=1 master=1 ctx=running",
+    "[audio-js] grpstop grp=2",
+    "[audio-js] grpstop grp=1",
+    "[audio-js] grpstop grp=2",
+    "[audio-js] play snd=21 ch=22 ready=0 paused=true ctx=running",
+    "[audio-js] chvol ch=22 -> 1",
+    "[audio-js] resume ch=22 at 0",
+    "[audio-js] play snd=7 ch=23 ready=1 paused=true ctx=running",
+    "[audio-js] chvol ch=23 -> 0.699999988079071",
+    "[audio-js] source started ch=23 off=0.00 dur=1.17 gain=0.699999988079071 master=1 ctx=running",
+    "[audio-js] resume ch=23 at 0",
+    "[audio-js] decoded \"C:\\\\menuLoop.mp3\" 30041ms",
+    "[audio-js] source started ch=22 off=0.00 dur=30.04 gain=1 master=1 ctx=running",
+    "[audio-js] grpstop grp=1",
+    "[audio-js] play snd=6 ch=24 ready=1 paused=true ctx=running",
+    "[audio-js] chvol ch=24 -> 0.30000001192092896",
+    "[audio-js] source started ch=24 off=0.00 dur=1.29 gain=0.30000001192092896 master=1 ctx=running",
+    "[audio-js] resume ch=24 at 0",
+    "[audio-js] play snd=25 ch=26 ready=0 paused=true ctx=running",
+    "[audio-js] chvol ch=26 -> 1",
+    "[audio-js] chvol ch=26 -> 1",
+    "[audio-js] chvol ch=26 -> 1",
+    "[audio-js] source started ch=26 off=0.00 dur=217.73 gain=1 master=1 ctx=running",
+    "[audio-js] resume ch=26 at 0"
+  ],
+  "browserError": "",
+  "conclusion": "Valid persisted Ogg audio decodes and plays. Matching the native AppData lookup and normalizing Windows paths changes native game playback from failed sound state 2 to decoded state 1 with a running nonzero-gain source."
+}

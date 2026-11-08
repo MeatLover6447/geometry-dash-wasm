@@ -6,7 +6,7 @@
 - Public GitHub Pages build: https://meatlover6447.github.io/geometry-dash-wasm/?perf
 - Full source and game package: https://github.com/MeatLover6447/geometry-dash-wasm
 
-The online host is public and opens without ChatGPT sign-in. Its small Worker streams the original compressed payloads from the exact GitHub commit `a2f5077ee6f2180015c02c3ff99206156218746c` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. The deployed archive is 2,145,282 bytes; all game resources remain available from GitHub.
+The online host is public and opens without ChatGPT sign-in. Its small Worker streams compressed payloads from the exact GitHub commit `d996ffecab08cfb9ab48caf1309427e16d338ca0` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. All game resources remain available from GitHub.
 
 Anonymous requests for the game page and content URL returned HTTP 200 after the public access change. Live checks returned HTTP 200 and valid responses for `getCustomContentURL.php` and `getGJLevels21.php`. Account login and online uploads have not been tested. GitHub Pages serves the full native game for built-in play, editor, saves, and FPS testing; online services require the online-enabled host.
 
@@ -18,6 +18,8 @@ Use the **20s test** button while playing a level to measure average native FPS 
 
 - Successful site deployment: `appgdep_6aef9fb4ceb88191a191bd5d71ed1399`
 - Saved version: `appgprj_6aed464a31588191972c138547eda82a~appgver_1a744df2c8b08191ad7671a53bd4f74e`
+
+The song fixes are deployed as build `00be722cca1c758b46070f3f`, deployment `appgdep_6aefe3d68ebc8191ad93c5903dd133ed`. Full public MP3 downloads passed for 404117, 1168082, and 590577. Song 10013017 passed native in-game playback with the final built runtime: decoded state 1, active unpaused source, gain 1, valid 217.73-second Ogg audio. The public host's loader hash was independently checked against this build. See `evidence/song-download-check.json`, `evidence/song-playback-final-check.json`, and `evidence/song-deployment-check.json`.
 
 ## Earlier deployment limit
 
