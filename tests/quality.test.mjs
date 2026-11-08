@@ -11,7 +11,7 @@ const bootStart = html.indexOf('var started = false;');
 const bootEnd = html.indexOf("\ndocument.getElementById('loadFly').addEventListener", bootStart);
 assert(bootStart >= 0 && bootEnd > bootStart);
 const bootCode = html.slice(bootStart, bootEnd);
-const keyboardStart = html.indexOf("document.addEventListener('keydown', function (e) {\nif (e.target === gdQualitySelect)");
+const keyboardStart = html.indexOf("document.addEventListener('keydown', function (e) {\nif (e.target === gdQualitySelect");
 const keyboardEnd = html.indexOf('\n});', keyboardStart) + 4;
 assert(keyboardStart >= 0 && keyboardEnd > keyboardStart);
 const keyboardCode = html.slice(keyboardStart, keyboardEnd);

@@ -5,11 +5,14 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {patchDownloadedAudio} from '../patches/downloaded-audio.mjs';
+import {patchWasm} from '../patches/reduced-area-colors.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'dist/gd_assets.json'),'utf8'));
 const upstream=JSON.parse(fs.readFileSync(path.join(root,'upstream/manifest.json'),'utf8'));
 const hash=data=>createHash('sha256').update(data).digest('hex');
-assert.equal(manifest.wasm.sha256,upstream.wasm.sha256,'Native engine must remain unchanged');
+const originalEngine=gunzipSync(fs.readFileSync(path.join(root,'upstream/wasm.gz')));
+assert.equal(hash(originalEngine),upstream.wasm.sha256,'Upstream native engine integrity');
+assert.equal(hash(patchWasm(originalEngine).output),manifest.wasm.sha256,'Only the verified optional area-color patch may change the engine');
 assert.equal(manifest.data.sha256,upstream.data.sha256,'Full game data must remain unchanged');
 const combined=createHash('sha256');
 for(const entry of [manifest.wasm,manifest.loader,...manifest.data.chunks]){

@@ -18,6 +18,8 @@ Use the **20s test** button while playing a level to measure average native FPS 
 
 [Performance mode](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&perf) selects 540p before loading. The public selector and saved preference were checked in Chromium. Four local 70,227-object level trials averaged 42.4 native FPS at 720p and 55.3 at 540p; these are Windows software-renderer measurements, not Chromebook results. The Performance UI is deployed as `appgdep_6aefee07d51c8191b6873dd5b389d5db`. Raw checks: `evidence/large-level-quality-comparison.json` and `evidence/performance-host-check.json`.
 
+[540p with reduced area colors](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&effects=reduced&perf) selects the optional native area-tint bypass. It changes color effects and leaves full colors as the default. Local CPU-throttled tests of How to platformer's first room improved from 23.51 to 59.08 FPS; the tested iSpy opening did not improve. These are not Chromebook measurements. See `evidence/reduced-area-colors-comparison.json`.
+
 - Successful site deployment: `appgdep_6aef9fb4ceb88191a191bd5d71ed1399`
 - Saved version: `appgprj_6aed464a31588191972c138547eda82a~appgver_1a744df2c8b08191ad7671a53bd4f74e`
 

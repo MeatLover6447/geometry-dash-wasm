@@ -16,7 +16,7 @@ fs.mkdirSync(path.join(output,'engine'),{recursive:true});
 await pipeline(fs.createReadStream(path.join(output,manifest.wasm.url)),createGunzip(),fs.createWriteStream(path.join(output,nativeUrl)));
 const digest=createHash('sha256');let bytes=0;
 for await(const chunk of fs.createReadStream(path.join(output,nativeUrl))){digest.update(chunk);bytes+=chunk.length;}
-assert.equal(bytes,manifest.wasm.size);assert.equal(digest.digest('hex'),manifest.wasm.sha256,'Original native WASM integrity');
+assert.equal(bytes,manifest.wasm.size);assert.equal(digest.digest('hex'),manifest.wasm.sha256,'Built native WASM integrity');
 manifest.wasm.nativeUrl=nativeUrl;
 manifest.build=createHash('sha256').update(JSON.stringify({...manifest,build:undefined})).digest('hex').slice(0,24);
 fs.writeFileSync(path.join(output,'gd_assets.json'),JSON.stringify(manifest));

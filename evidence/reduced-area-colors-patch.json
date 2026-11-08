@@ -1,0 +1,48 @@
+{
+  "patch": {
+    "input": {
+      "bytes": 123481510,
+      "sha256": "523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a"
+    },
+    "output": {
+      "bytes": 123481559,
+      "sha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e",
+      "validatedByNode": true
+    },
+    "functionIndex": 9409,
+    "functionType": "(i32 registers) -> void",
+    "helperIndex": 2870,
+    "originalTintBodySha256": "600a40da7fe7336e533401af11ebc9839d2d89dfc6e147b0c805c96ec66683a0",
+    "helperBodySha256": "ebc2d772cd63981d7b10daac3354408bcdca567df4322ae9a2da5e833da649cd",
+    "patchedTintBodySha256": "3c82128883a8a3e783061078720e9af21a8a036287b57f6d475431e659ebae57",
+    "globalIndex": 36,
+    "flagExport": "gdReducedAreaTint",
+    "defaultValue": 0,
+    "guardBytes": 24,
+    "localDeclarationBytes": 8,
+    "resumeGuardAddress": 346324656,
+    "changedSections": [
+      6,
+      7,
+      10
+    ]
+  },
+  "tests": {
+    "deterministic": true,
+    "changedFunctionIndices": [
+      9409
+    ],
+    "unchangedDefaultInstructions": true,
+    "unchangedOtherSections": true,
+    "rejectsWrongInput": true,
+    "validatedFullCandidate": true,
+    "nativeRetHarness": {
+      "flagOffOriginalPath": true,
+      "flagOnRetBalancesGuestStack": true,
+      "preservesOtherRegisters": true,
+      "resumedCallsKeepOriginalPath": true,
+      "helperClearsResumeState": true
+    },
+    "candidateSha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e"
+  }
+}

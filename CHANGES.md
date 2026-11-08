@@ -1,6 +1,6 @@
 # Changes and measured results
 
-The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, and downloaded-audio path lookup; it does not claim authorship of the original port. The native WASM SHA-256 remains `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`, and the complete data-package hash remains unchanged.
+The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and an optional area-color control; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine adds 49 bytes for an opt-in visual-effects guard. The complete data-package hash remains unchanged.
 
 ## Startup comparison
 
@@ -25,7 +25,7 @@ A 10-second native gameplay diagnostic observed about 60 FPS and 17.9 ms frame p
 
 ## Retained and rejected work
 
-- The original native WASM, game logic, resources, and input shim are retained and credited upstream. The audio shim includes the AppData lookup fix below.
+- The original native game logic, resources, and input shim are retained and credited upstream. The audio shim includes the AppData lookup fix below; the optional native color guard is described below.
 - A Binaryen `-O2` experiment exceeded its five-minute resource bound and was stopped. A smaller cleanup pass changed only 40 bytes. Neither candidate was shipped.
 - Compiled-module storage in IndexedDB was rejected after a real-browser test produced `DataCloneError`; no failing cache layer was added.
 - The earlier seven-level recreation was discarded from the deliverable.
@@ -61,3 +61,15 @@ A pre-boot selector adds Performance 540p (960×540), alongside Standard 720p an
 Performance draws 43.75% fewer pixels than Standard. Four clean 10-second runs on a 70,227-object auto version of Change of Scene, ordered Standard/Performance/Performance/Standard, averaged **42.4 → 55.3 native FPS** (+30.5%); the mean of the two frame-p95 values fell **38.6 → 27.7 ms**. These tests used Windows headless Chromium with SwiftShader software rendering, without CPU throttling, CPU profiling, or GL-call instrumentation during the recorded samples. This is a small local comparison, not a Chromebook FPS guarantee. Raw results: `evidence/large-level-quality-comparison.json`.
 
 A separate CPU-throttled diagnostic found most time in native WASM level processing. It confirmed existing native matrix caching and relatively small client-vertex uploads, so no additional state cache or upload-coalescing patch was shipped. Performance mode helps GPU-bound scenes; CPU-bound levels and the roughly 914 MiB WASM heap remain limitations.
+
+## Optional reduced area colors
+
+The supplied Chromebook is an HP 11mk G9 EE with a MediaTek Kompanio 500 and 4 GB RAM, already using 540p. A profile of How to platformer (104187415, 87,378 objects) found over half of sampled CPU time in the native `GJBaseGameLayer::processAreaTintGroupAction` routine. Lower resolution and the game's LDM flags do not remove that work.
+
+A default-off checkbox skips this color routine using a 24-byte guard and the existing native RET helper. The original instruction stream remains exact after the guard, every other function body is unchanged, and resumed native calls always retain the original path. Parent transition timers and the native movement/collision routines remain present. Skipping tint interpolation changes some level colors, which is stated beside the checkbox. The setting applies at boot and never edits save files or level data.
+
+Four clean 10-second samples in one running scene, ordered Full/Reduced/Reduced/Full, measured **23.18 / 59.25 / 58.91 / 23.85 native FPS**. The two-sample means are **23.51 → 59.08 FPS**; mean frame-p95 falls **45.85 → 18.95 ms**. These are Windows headless Chromium/SwiftShader results at 540p with CDP CPU throttling 4, in the stationary first room. CPU throttling is not ARM hardware emulation. No CPU profiler or GL-call instrumentation ran during these samples.
+
+The same comparison on iSpyWithMyLittleEye (89886591, 42,014 objects) measured **32.10 → 31.65 FPS**, providing no benefit in its tested opening/repeated early deaths. Later sections and actual Chromebook FPS remain unchecked. This option targets area tinting; it is not a universal fix for animation-heavy levels.
+
+The full candidate validates in V8. Tests verify deterministic output, input integrity, unchanged other function bodies, flag-off behavior, guest stack/return-address handling, preserved registers, and native resume fallback. A final build booted with the real exported flag set to 1, without a test-time WASM replacement. The native heap still reached 1,100 MiB on How to platformer. Compiler-local cleanup and general low-detail experiments were not shipped because they did not establish a reliable benefit. Raw results: `evidence/reduced-area-colors-comparison.json` and `evidence/reduced-area-colors-patch.json`.
