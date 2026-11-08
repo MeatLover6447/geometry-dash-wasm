@@ -25,6 +25,7 @@ jobs:
           node tests/benchmark.test.mjs
           node tests/worker.test.mjs
           node tests/audio-paths.test.mjs
+          node tests/quality.test.mjs
       - name: Prepare static Pages build
         run: node scripts/build-pages.mjs
       - uses: actions/upload-pages-artifact@v4

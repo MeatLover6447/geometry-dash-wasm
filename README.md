@@ -7,6 +7,7 @@ The supplied installation is compatible with the runtime: all three executable `
 ## Play
 
 - [Online-enabled host and FPS test](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf) — public; no ChatGPT sign-in required.
+- [Performance mode for slower devices](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&perf) — 540p rendering with the full native game.
 - [Public GitHub Pages and FPS test](https://meatlover6447.github.io/geometry-dash-wasm/?perf) — built-in levels, editor, and browser saves; online services are unavailable here.
 
 [HOSTING.md](HOSTING.md) describes the deployed builds and checks. First load downloads about 300 MB; repeat visits use the browser cache. Each host keeps separate browser saves.
@@ -14,6 +15,8 @@ The supplied installation is compatible with the runtime: all three executable `
 GitHub Pages builds are created by `.github/workflows/pages.yml`. Run `node scripts/build-pages.mjs` to stage the same static build locally. The raw 123 MB WASM is generated only during deployment; the repository retains its original compressed payload, under GitHub's individual-file limit. Pages supports built-in levels, the editor, browser saves, and the FPS counter, but needs a backend for online game services.
 
 Add `?perf` to the game URL to enable a 20-second native FPS test. Keep the tab visible and play a level during the test. This reports native frame-count averages; it does not measure total input-to-display latency.
+
+Before loading, choose **Performance · 540p**, **Standard · 720p**, or **High · 1080p**. The selector remembers your choice in this browser. A `?quality=performance`, `?quality=standard`, or `?quality=high` URL takes precedence over the saved setting. Standard remains the default. Performance renders 43.75% fewer pixels than Standard; it trades image sharpness for lower GPU work without changing native physics. The setting locks once loading starts.
 
 Double-click **Play.cmd** on Windows. Node.js is already installed on this computer. Or run `node serve.mjs` in this folder and open http://127.0.0.1:4174. Press Ctrl+C in the server window to stop it.
 
@@ -40,6 +43,7 @@ node tests/verify-build.mjs
 node tests/server.test.mjs
 node tests/audio-paths.test.mjs
 node tests/worker.test.mjs
+node tests/quality.test.mjs
 ```
 
 The small patches are in `patches/`. The matching upstream loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies the upstream hashes before applying the patches. It preserves the native WASM and full data-package hashes.

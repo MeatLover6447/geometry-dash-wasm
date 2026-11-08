@@ -53,3 +53,11 @@ Downloaded library music was recognized by the native filesystem, whose bare-nam
 Full public-host downloads passed for songs 404117 (7,651,704 bytes), 1168082 (7,507,661 bytes), and 590577 (9,817,931 bytes), all HTTP 200 with valid MP3 headers. See `evidence/song-download-check.json`.
 
 With the final built runtime, native playback of 10013017 opened `/AppData/10013017.ogg` from the Windows-style filename, decoded 217.73 seconds of stereo audio, and started an unpaused native audio channel at gain 1. The public host's loader SHA-256 matches the tested build. See `evidence/song-playback-final-check.json` and `evidence/song-deployment-check.json`. No browser-only path override was used for this final check.
+
+## Performance mode for large levels
+
+A pre-boot selector adds Performance 540p (960×540), alongside Standard 720p and High 1080p. Standard stays the default. The selection is stored in this browser; an explicit `quality` URL parameter takes precedence. Resolution locks at boot, so changing it cannot reset a running level. The full native engine, physics, resources, and downloaded-song fixes remain unchanged.
+
+Performance draws 43.75% fewer pixels than Standard. Four clean 10-second runs on a 70,227-object auto version of Change of Scene, ordered Standard/Performance/Performance/Standard, averaged **42.4 → 55.3 native FPS** (+30.5%); the mean of the two frame-p95 values fell **38.6 → 27.7 ms**. These tests used Windows headless Chromium with SwiftShader software rendering, without CPU throttling, CPU profiling, or GL-call instrumentation during the recorded samples. This is a small local comparison, not a Chromebook FPS guarantee. Raw results: `evidence/large-level-quality-comparison.json`.
+
+A separate CPU-throttled diagnostic found most time in native WASM level processing. It confirmed existing native matrix caching and relatively small client-vertex uploads, so no additional state cache or upload-coalescing patch was shipped. Performance mode helps GPU-bound scenes; CPU-bound levels and the roughly 914 MiB WASM heap remain limitations.

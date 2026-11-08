@@ -1,0 +1,214 @@
+{
+  "level": {
+    "id": "90484495",
+    "name": "Change of Scene Auto",
+    "objectCount": 70227,
+    "compressedChars": 1325552
+  },
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "method": "Four sequential 10-second native gameplay samples, order standard/performance/performance/standard. Windows Chromium headless, SwiftShader software rendering, no CPU throttling, debugger CPU profiler, or GL call instrumentation during these samples.",
+  "standard": {
+    "size": [
+      1280,
+      720
+    ],
+    "meanFps": 42.42491934449254,
+    "frameP95Ms": 38.550000071525574
+  },
+  "performance": {
+    "size": [
+      960,
+      540
+    ],
+    "meanFps": 55.343803448419386,
+    "frameP95Ms": 27.649999976158142
+  },
+  "limits": "Small local sample using an auto version of Change of Scene. Not measured on the Chromebook. Native CPU work and WASM heap size remain unchanged.",
+  "trials": [
+    {
+      "label": "standard-clean-1",
+      "quality": "standard",
+      "throttle": 1,
+      "level": {
+        "id": "90484495",
+        "name": "Change of Scene Auto",
+        "objectCount": 70227,
+        "compressedChars": 1325552
+      },
+      "device": {
+        "width": 1280,
+        "height": 720,
+        "attributes": {
+          "alpha": false,
+          "antialias": false,
+          "depth": true,
+          "desynchronized": false,
+          "failIfMajorPerformanceCaveat": false,
+          "powerPreference": "high-performance",
+          "premultipliedAlpha": true,
+          "preserveDrawingBuffer": false,
+          "stencil": true,
+          "xrCompatible": false
+        },
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "glGlobal": "object"
+      },
+      "frameDelta": 442,
+      "elapsed": 10640.700000047684,
+      "benchmark": {
+        "running": false,
+        "frames": 425,
+        "elapsedMs": 10012.5,
+        "meanFps": 42.44694132334582,
+        "frameP95Ms": 37.700000047683716,
+        "frameMaxMs": 82.70000004768372,
+        "inputP95Ms": null,
+        "heapMiB": 913.875
+      },
+      "error": "",
+      "heapMiB": 913.875,
+      "taskMs": 10149.865,
+      "errors": [],
+      "hot": []
+    },
+    {
+      "label": "performance-clean-1",
+      "quality": "performance",
+      "throttle": 1,
+      "level": {
+        "id": "90484495",
+        "name": "Change of Scene Auto",
+        "objectCount": 70227,
+        "compressedChars": 1325552
+      },
+      "device": {
+        "width": 960,
+        "height": 540,
+        "attributes": {
+          "alpha": false,
+          "antialias": false,
+          "depth": true,
+          "desynchronized": false,
+          "failIfMajorPerformanceCaveat": false,
+          "powerPreference": "high-performance",
+          "premultipliedAlpha": true,
+          "preserveDrawingBuffer": false,
+          "stencil": true,
+          "xrCompatible": false
+        },
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "glGlobal": "object"
+      },
+      "frameDelta": 578,
+      "elapsed": 10617.5,
+      "benchmark": {
+        "running": false,
+        "frames": 555,
+        "elapsedMs": 10012.800000190735,
+        "meanFps": 55.42905081390098,
+        "frameP95Ms": 27.700000047683716,
+        "frameMaxMs": 51.90000009536743,
+        "inputP95Ms": null,
+        "heapMiB": 913.875
+      },
+      "error": "",
+      "heapMiB": 913.875,
+      "taskMs": 9387.387999999999,
+      "errors": [],
+      "hot": []
+    },
+    {
+      "label": "performance-clean-2",
+      "quality": "performance",
+      "throttle": 1,
+      "level": {
+        "id": "90484495",
+        "name": "Change of Scene Auto",
+        "objectCount": 70227,
+        "compressedChars": 1325552
+      },
+      "device": {
+        "width": 960,
+        "height": 540,
+        "attributes": {
+          "alpha": false,
+          "antialias": false,
+          "depth": true,
+          "desynchronized": false,
+          "failIfMajorPerformanceCaveat": false,
+          "powerPreference": "high-performance",
+          "premultipliedAlpha": true,
+          "preserveDrawingBuffer": false,
+          "stencil": true,
+          "xrCompatible": false
+        },
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "glGlobal": "object"
+      },
+      "frameDelta": 577,
+      "elapsed": 10632.699999809265,
+      "benchmark": {
+        "running": false,
+        "frames": 553,
+        "elapsedMs": 10007.5,
+        "meanFps": 55.258556082937794,
+        "frameP95Ms": 27.59999990463257,
+        "frameMaxMs": 52.40000009536743,
+        "inputP95Ms": null,
+        "heapMiB": 913.875
+      },
+      "error": "",
+      "heapMiB": 913.875,
+      "taskMs": 9461.034,
+      "errors": [],
+      "hot": []
+    },
+    {
+      "label": "standard-clean-2",
+      "quality": "standard",
+      "throttle": 1,
+      "level": {
+        "id": "90484495",
+        "name": "Change of Scene Auto",
+        "objectCount": 70227,
+        "compressedChars": 1325552
+      },
+      "device": {
+        "width": 1280,
+        "height": 720,
+        "attributes": {
+          "alpha": false,
+          "antialias": false,
+          "depth": true,
+          "desynchronized": false,
+          "failIfMajorPerformanceCaveat": false,
+          "powerPreference": "high-performance",
+          "premultipliedAlpha": true,
+          "preserveDrawingBuffer": false,
+          "stencil": true,
+          "xrCompatible": false
+        },
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "glGlobal": "object"
+      },
+      "frameDelta": 441,
+      "elapsed": 10630.099999904633,
+      "benchmark": {
+        "running": false,
+        "frames": 425,
+        "elapsedMs": 10022.899999856949,
+        "meanFps": 42.40289736563926,
+        "frameP95Ms": 39.40000009536743,
+        "frameMaxMs": 81.40000009536743,
+        "inputP95Ms": null,
+        "heapMiB": 913.875
+      },
+      "error": "",
+      "heapMiB": 913.875,
+      "taskMs": 10148.382,
+      "errors": [],
+      "hot": []
+    }
+  ],
+  "fpsGainPercent": 30.451169509657383
+}
