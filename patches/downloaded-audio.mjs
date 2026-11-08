@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import {Script} from 'node:vm';
 export function patchDownloadedAudio(original){
  let source=original.toString();
+ const pathBefore='        var p = String(path || "");';
+ assert.equal(source.split(pathBefore).length-1,1,'Expected the upstream audio path conversion');
+ source=source.replace(pathBefore,String.raw`        var p = String(path || "").replace(/\\/g, "/");`);
  const before='        add(noDrive);\n        add("/Resources/" + noDrive);';
  assert.equal(source.split(before).length-1,1,'Expected the upstream audio path lookup');
  source=source.replace(before,'        add(noDrive);\n        add("/AppData/" + base);\n        add("/Resources/" + noDrive);');

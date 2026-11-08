@@ -1,0 +1,28 @@
+{
+  "reports": [
+    {
+      "id": "404117",
+      "status": 200,
+      "type": "audio/mpeg",
+      "bytes": 7651704,
+      "mp3Header": true,
+      "sha256": "2106b1c276a9f9a697c89a283b785242e7a387144515e99eacd5470169da4db3"
+    },
+    {
+      "id": "1168082",
+      "status": 200,
+      "type": "audio/mpeg",
+      "bytes": 7507661,
+      "mp3Header": true,
+      "sha256": "bee153b50fe603f9f2d8121794864a396aa296e02610a4ee17edf77d99ff473d"
+    },
+    {
+      "id": "590577",
+      "status": 200,
+      "type": "audio/mpeg",
+      "bytes": 9817931,
+      "mp3Header": true,
+      "sha256": "c660179dfdaf49c9101a97798593f5a95b52ea4ad250c22b98fa6fa3a3ee58d9"
+    }
+  ]
+}
