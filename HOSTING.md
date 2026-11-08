@@ -20,6 +20,8 @@ Use the **20s test** button while playing a level to measure average native FPS 
 
 [540p with reduced area colors](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&effects=reduced&perf) selects the optional native area-tint bypass. It changes color effects and leaves full colors as the default. Local CPU-throttled tests of How to platformer's first room improved from 23.51 to 59.08 FPS; the tested iSpy opening did not improve. These are not Chromebook measurements. See `evidence/reduced-area-colors-comparison.json`.
 
+This option is live as build `da52a89ca1b4c322976acaa2`, deployment `appgdep_6af1029199548191b5291ccd5ed20450`. Anonymous HTTP checks confirmed the new engine on both hosts and a working online content-URL service. A public-host Chromium run confirmed the actual native control was enabled, played the first two rooms, and passed pause/resume and restart with no browser errors. See `evidence/reduced-effects-host-check.json`. GitHub Pages workflow run 42534161857 passed all build checks and deployment.
+
 - Successful site deployment: `appgdep_6aef9fb4ceb88191a191bd5d71ed1399`
 - Saved version: `appgprj_6aed464a31588191972c138547eda82a~appgver_1a744df2c8b08191ad7671a53bd4f74e`
 
