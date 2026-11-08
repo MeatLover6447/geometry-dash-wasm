@@ -6,7 +6,7 @@
 - Public GitHub Pages build: https://meatlover6447.github.io/geometry-dash-wasm/?perf
 - Full source and game package: https://github.com/MeatLover6447/geometry-dash-wasm
 
-The online host is public and opens without ChatGPT sign-in. Its small Worker streams compressed payloads from the exact GitHub commit `d996ffecab08cfb9ab48caf1309427e16d338ca0` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. All game resources remain available from GitHub.
+The online host is public and opens without ChatGPT sign-in. Its small Worker streams compressed payloads from the exact GitHub commit `689eec1e50c83c36e4732dcd07dad990ced3a9f1` and forwards allowlisted game-service requests. No public CORS proxy or paid hosting account was added. All game resources remain available from GitHub.
 
 Anonymous requests for the game page and content URL returned HTTP 200 after the public access change. Live checks returned HTTP 200 and valid responses for `getCustomContentURL.php` and `getGJLevels21.php`. Account login and online uploads have not been tested. GitHub Pages serves the full native game for built-in play, editor, saves, and FPS testing; online services require the online-enabled host.
 
@@ -15,6 +15,8 @@ The online host passed a real Chromium boot and built-in-level gameplay check wi
 The public Pages build also passed real-browser native boot and built-in-level gameplay: 59.8 native FPS average over 20 seconds, with no browser errors. Cold first frame took 25.2 seconds in that run. Raw results: `evidence/pages-browser-check.json`.
 
 Use the **20s test** button while playing a level to measure average native FPS and WASM heap. First load downloads about 300 MB; the browser caches payloads for later visits. Browser saves are separate for each host.
+
+[Performance mode](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&perf) selects 540p before loading. The public selector and saved preference were checked in Chromium. Four local 70,227-object level trials averaged 42.4 native FPS at 720p and 55.3 at 540p; these are Windows software-renderer measurements, not Chromebook results. The Performance UI is deployed as `appgdep_6aefee07d51c8191b6873dd5b389d5db`. Raw checks: `evidence/large-level-quality-comparison.json` and `evidence/performance-host-check.json`.
 
 - Successful site deployment: `appgdep_6aef9fb4ceb88191a191bd5d71ed1399`
 - Saved version: `appgprj_6aed464a31588191972c138547eda82a~appgver_1a744df2c8b08191ad7671a53bd4f74e`
