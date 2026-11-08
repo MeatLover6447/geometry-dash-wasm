@@ -7,7 +7,7 @@ async function assets(request,env){
  }
  return env.ASSETS.fetch(request);
 }
-const hosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
+const hosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
 export function gameTarget(value){
  const url=new URL(value);
  if(!['http:','https:'].includes(url.protocol)||!hosts.has(url.hostname)||url.username||url.password||url.port)throw Error('Unsupported game service');
@@ -18,6 +18,16 @@ async function gameProxy(request,url){
  let target;try{target=gameTarget(url.searchParams.get('url'));}catch{return new Response('Unsupported game service',{status:403});}
  if(!['GET','HEAD','POST'].includes(request.method))return new Response(null,{status:405});
  let method=request.method,body;
+ const song=/^\/audio\/download\/(\d{1,10})\/?$/.exec(target.pathname);
+ if((target.hostname==='newgrounds.com'||target.hostname==='www.newgrounds.com')&&song&&method!=='POST'){
+  // Resolve the game's legacy download URLs through its official song metadata.
+  const info=await fetch('https://www.boomlings.com/database/getGJSongInfo.php',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(30000),headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':''},body:'songID='+song[1]+'&secret=Wmfd2893gb7'});
+  if(!info.ok)return new Response('Song metadata unavailable',{status:502});
+  const fields=(await info.text()).split('~|~');
+  const key=fields.findIndex((value,index)=>index%2===0&&value==='10');
+  if(fields[0]!=='1'||fields[1]!==song[1]||key<0||!fields[key+1])return new Response('Song unavailable from the game service',{status:404});
+  try{target=gameTarget(decodeURIComponent(fields[key+1]));}catch{return new Response('Unsupported song download address',{status:502});}
+ }
  if(method==='POST'){
   const chunks=[],reader=request.body?.getReader();let size=0;
   if(reader)for(;;){const part=await reader.read();if(part.done)break;size+=part.value.length;if(size>16*1024*1024){await reader.cancel();return new Response('Request too large',{status:413});}chunks.push(part.value);}

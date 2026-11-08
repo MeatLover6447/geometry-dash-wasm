@@ -1,6 +1,6 @@
 # Changes and measured results
 
-The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, and serving layer; it does not claim authorship of the original port. The native WASM SHA-256 remains `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`, and the complete data-package hash remains unchanged.
+The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, and downloaded-audio path lookup; it does not claim authorship of the original port. The native WASM SHA-256 remains `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`, and the complete data-package hash remains unchanged.
 
 ## Startup comparison
 
@@ -25,7 +25,7 @@ A 10-second native gameplay diagnostic observed about 60 FPS and 17.9 ms frame p
 
 ## Retained and rejected work
 
-- The original native WASM, game logic, resources, and input/audio shims are retained and credited upstream.
+- The original native WASM, game logic, resources, and input shim are retained and credited upstream. The audio shim includes the AppData lookup fix below.
 - A Binaryen `-O2` experiment exceeded its five-minute resource bound and was stopped. A smaller cleanup pass changed only 40 bytes. Neither candidate was shipped.
 - Compiled-module storage in IndexedDB was rejected after a real-browser test produced `DataCloneError`; no failing cache layer was added.
 - The earlier seven-level recreation was discarded from the deliverable.
@@ -43,3 +43,9 @@ The complete package is uploaded to `MeatLover6447/geometry-dash-wasm`, with Git
 The online-enabled host deploys a 2.1 MB browser shell and restricted service bridge; it streams the original compressed payloads from a pinned GitHub commit. This resolves the host's 256 MiB deployment input limit without removing game resources. The host is now public and opens without ChatGPT sign-in. Live content-URL and online level-list requests both returned valid HTTP 200 responses. No paid hosting account was added.
 
 Both hosted builds passed native boot and built-in-level gameplay in Chromium. Each 20-second test measured 59.8 native FPS average on this Windows machine, with a 910 MiB WASM heap. See `evidence/hosted-browser-check.json` and `evidence/pages-browser-check.json`. Chromebook performance, account login, and online uploads remain untested.
+
+## Online song fixes
+
+Newgrounds' legacy `/audio/download/<id>` endpoint returned browser-check HTML or rate-limit errors. The service bridge now resolves these addresses using the official `getGJSongInfo.php` response and validates the resulting download host. The current Geometry Dash content CDN is included in the allowlist. This applies to both the hosted Worker and local server.
+
+Downloaded library music was recognized by the native filesystem, whose bare-name lookup prefers `/AppData/<filename>`, but the JavaScript audio bridge omitted that folder. The runtime patch adds this one lookup, leaving the native engine and audio decoding/playback implementation unchanged. The regression test verifies that a downloaded Ogg file reaches the decoder without falling through to an HTTP request.

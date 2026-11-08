@@ -26,8 +26,9 @@ The original game handles its menus, controls, levels, editor, and game modes. P
 - WASM streaming preserves the original HTTP response and a stable content-addressed URL. This enables Chrome's compiled-code cache, which the original reconstructed responses did not populate in testing.
 - The local server serves compressed WASM with the correct MIME type, content encoding, immutable caching, and a restricted bridge to the game's online services. Account traffic is not sent through public CORS proxy services.
 - The wrapper defaults to 720p, excludes unrelated site scripts, and waits for saved files to finish restoring before native boot.
+- Legacy Newgrounds download URLs resolve through Geometry Dash's official song metadata. Downloaded audio is read from the native game's AppData folder.
 
-The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. [CHANGES.md](CHANGES.md) includes the measured comparison and its limits.
+The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. The audio runtime has one downloaded-file lookup fix. [CHANGES.md](CHANGES.md) includes the measured comparison and its limits.
 
 ## Rebuild and check
 
@@ -37,6 +38,8 @@ No dependency installation or compilation toolchain is needed to rebuild these J
 node scripts/build-runtime.mjs
 node tests/verify-build.mjs
 node tests/server.test.mjs
+node tests/audio-paths.test.mjs
+node tests/worker.test.mjs
 ```
 
 The small patches are in `patches/`. The matching upstream loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies the upstream hashes before applying the patches. It preserves the native WASM and full data-package hashes.

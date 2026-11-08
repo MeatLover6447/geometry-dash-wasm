@@ -10,7 +10,7 @@ const root=fileURLToPath(new URL('./dist/',import.meta.url));
 const manifest=JSON.parse(readFileSync(path.join(root,'gd_assets.json'),'utf8'));
 const wasmPath=`/engine/${manifest.wasm.sha256}.wasm`;
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.gz':'application/octet-stream','.wasm':'application/wasm'};
-const allowedHosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
+const allowedHosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
 export function gameTarget(value){
   const target=new URL(value);
   if(!['http:','https:'].includes(target.protocol)||!allowedHosts.has(target.hostname)||target.username||target.password||target.port)throw Error('Unsupported game service');
@@ -21,6 +21,16 @@ async function proxy(req,res,url){
   let target;try{target=gameTarget(url.searchParams.get('url'));}catch{res.writeHead(403).end('Unsupported game service');return;}
   if(!['GET','HEAD','POST'].includes(req.method)){res.writeHead(405).end();return;}
   let body,method=req.method;
+  const song=/^\/audio\/download\/(\d{1,10})\/?$/.exec(target.pathname);
+  if((target.hostname==='newgrounds.com'||target.hostname==='www.newgrounds.com')&&song&&method!=='POST'){
+    // Resolve the game's legacy download URLs through its official song metadata.
+    const info=await fetch('https://www.boomlings.com/database/getGJSongInfo.php',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(30000),headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':''},body:'songID='+song[1]+'&secret=Wmfd2893gb7'});
+    if(!info.ok){res.writeHead(502).end('Song metadata unavailable');return;}
+    const fields=(await info.text()).split('~|~');
+    const key=fields.findIndex((value,index)=>index%2===0&&value==='10');
+    if(fields[0]!=='1'||fields[1]!==song[1]||key<0||!fields[key+1]){res.writeHead(404).end('Song unavailable from the game service');return;}
+    try{target=gameTarget(decodeURIComponent(fields[key+1]));}catch{res.writeHead(502).end('Unsupported song download address');return;}
+  }
   if(method==='POST'){
     const chunks=[];let length=0;
     for await(const chunk of req){length+=chunk.length;if(length>16*1024*1024){res.writeHead(413).end('Request too large');return;}chunks.push(chunk);}
