@@ -23,5 +23,15 @@ try{
  response=await worker.fetch(new Request('https://game.test/__proxy?url='+encodeURIComponent('https://www.newgrounds.com/audio/download/404117')),env);assert.equal(response.status,502);
  globalThis.fetch=async()=>new Response('1~|~999~|~10~|~'+encodeURIComponent('https://audio.ngfiles.com/wrong.mp3'));
  response=await worker.fetch(new Request('https://game.test/__proxy?url='+encodeURIComponent('https://www.newgrounds.com/audio/download/404117')),env);assert.equal(response.status,404);
+ const accountBody='accountID=0&gjp2=dummy&saveData=encoded%2B%2F%3D&secret=test';
+ for(const host of ['www.robtopgames.org','www.robtopgames.net'])for(const endpoint of ['syncGJAccountNew.php','backupGJAccountNew.php']){
+  globalThis.fetch=async(url,options)=>{assert.equal(String(url),`https://${host}/database/accounts/${endpoint}`);assert.equal(options.method,'POST');assert.equal(options.headers['Content-Type'],'application/x-www-form-urlencoded');assert.equal(Buffer.from(options.body).toString(),accountBody);return new Response('test-save;test-levels;21;0',{headers:{'Content-Type':'text/plain'}});};
+  response=await worker.fetch(new Request('https://game.test/__proxy?url='+encodeURIComponent(`http://${host}/database/accounts/${endpoint}`),{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:accountBody}),env);
+  assert.equal(response.status,200);assert.equal(await response.text(),'test-save;test-levels;21;0');assert.equal(response.headers.get('cache-control'),'no-store');
+ }
+ globalThis.fetch=()=>{throw Error('Blocked account destinations must never be fetched');};
+ for(const target of ['https://www.robtopgames.org/','https://www.robtopgames.net/database/other.php','https://www.robtopgames.org.evil.example/database/accounts/syncGJAccountNew.php','https://name:secret@www.robtopgames.org/database/accounts/syncGJAccountNew.php']){
+  response=await worker.fetch(new Request('https://game.test/__proxy?url='+encodeURIComponent(target),{method:'POST',body:accountBody}),env);assert.equal(response.status,403);
+ }
  console.log('Worker checks passed: pinned asset allowlist, streaming native gzip, HEAD, local fallback, restricted service proxy.');
 }finally{globalThis.fetch=originalFetch;}

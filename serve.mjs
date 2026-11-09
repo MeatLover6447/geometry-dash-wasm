@@ -10,10 +10,15 @@ const root=fileURLToPath(new URL('./dist/',import.meta.url));
 const manifest=JSON.parse(readFileSync(path.join(root,'gd_assets.json'),'utf8'));
 const wasmPath=`/engine/${manifest.wasm.sha256}.wasm`;
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.gz':'application/octet-stream','.wasm':'application/wasm'};
-const allowedHosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
+const accountHosts=new Set(['www.robtopgames.org','www.robtopgames.net']);
+const allowedHosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com',...accountHosts]);
 export function gameTarget(value){
   const target=new URL(value);
   if(!['http:','https:'].includes(target.protocol)||!allowedHosts.has(target.hostname)||target.username||target.password||target.port)throw Error('Unsupported game service');
+  if(accountHosts.has(target.hostname)){
+    if(!/^\/database\/accounts\/(?:sync|backup)GJAccountNew\.php$/.test(target.pathname))throw Error('Unsupported account service');
+    target.protocol='https:';
+  }
   if(target.hostname.endsWith('boomlings.com'))target.protocol='https:';
   return target;
 }

@@ -7,10 +7,15 @@ async function assets(request,env){
  }
  return env.ASSETS.fetch(request);
 }
-const hosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com']);
+const accountHosts=new Set(['www.robtopgames.org','www.robtopgames.net']);
+const hosts=new Set(['boomlings.com','www.boomlings.com','accounts.boomlings.com','geometrydashcontent.com','www.geometrydashcontent.com','download.geometrydashcontent.com','geometrydashfiles.b-cdn.net','geometrydashcontent.b-cdn.net','newgrounds.com','www.newgrounds.com','audio.ngfiles.com','api.newgrounds.com',...accountHosts]);
 export function gameTarget(value){
  const url=new URL(value);
  if(!['http:','https:'].includes(url.protocol)||!hosts.has(url.hostname)||url.username||url.password||url.port)throw Error('Unsupported game service');
+ if(accountHosts.has(url.hostname)){
+  if(!/^\/database\/accounts\/(?:sync|backup)GJAccountNew\.php$/.test(url.pathname))throw Error('Unsupported account service');
+  url.protocol='https:';
+ }
  if(url.hostname.endsWith('boomlings.com'))url.protocol='https:';
  return url;
 }
