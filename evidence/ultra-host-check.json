@@ -1,0 +1,74 @@
+{
+  "deployment": "appgdep_6af282299e5c81918998a750fed3089b",
+  "savedVersion": "appgprj_6aed464a31588191972c138547eda82a~appgver_ca12aa183e9081919f69488a983d0513",
+  "sourceCommit": "3e8d211b8bb3d6e03cecac2fdfa1b57bbba01e96",
+  "githubCommit": "656e38dda6ba7706d5792bc6ff5d3bcb2f9bb923",
+  "githubActions": {
+    "run": 42743342825,
+    "conclusion": "success"
+  },
+  "http": {
+    "build": "48576fdbbcedb5b65a971443",
+    "wasmSha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e",
+    "loaderSha256": "d2446031416e2aabd7961ede27414bf12776cdde0be3ecf3082171436c1c3872",
+    "ultraOption": true,
+    "spatialTrialRemoved": true,
+    "engine": {
+      "status": 200,
+      "type": "application/wasm",
+      "encoding": "gzip"
+    },
+    "sync": {
+      "status": 200,
+      "body": "-1",
+      "noCache": "no-store",
+      "dummyAccountOnly": true
+    },
+    "pagesBuild": "ab5b932cdb67c531958c0db6"
+  },
+  "browser": {
+    "environment": "Windows headless Chromium / SwiftShader, isolated test save; not a Chromebook",
+    "level": {
+      "id": "104187415",
+      "name": "How to platformer",
+      "objectCount": 87378,
+      "compressedChars": 572396
+    },
+    "device": {
+      "width": 640,
+      "height": 360,
+      "displayWidth": 1366,
+      "displayHeight": 768,
+      "fullscreen": true,
+      "attributes": {
+        "alpha": false,
+        "antialias": false,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": true,
+        "xrCompatible": false
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "glGlobal": "object",
+      "build": "48576fdbbcedb5b65a971443",
+      "reducedAreaTint": 1
+    },
+    "smoke": {
+      "flag": 1,
+      "frames": 1368,
+      "error": ""
+    },
+    "error": "",
+    "errors": [],
+    "coverage": [
+      "public native boot",
+      "640x360 buffer at 1366x768 fullscreen",
+      "movement/jump to room 2",
+      "pause/resume and restart"
+    ]
+  }
+}
