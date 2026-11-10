@@ -1,6 +1,6 @@
 # Changes and measured results
 
-The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and an optional area-color control; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine adds 49 bytes for an opt-in visual-effects guard. The complete data-package hash remains unchanged.
+The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and optional area-color/spatial controls; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine adds 49 bytes for an opt-in visual-effects guard and 309 bytes for a default-off spatial trial. The complete data-package hash remains unchanged.
 
 ## Startup comparison
 
@@ -73,3 +73,23 @@ Four clean 10-second samples in one running scene, ordered Full/Reduced/Reduced/
 The same comparison on iSpyWithMyLittleEye (89886591, 42,014 objects) measured **32.10 → 31.65 FPS**, providing no benefit in its tested opening/repeated early deaths. Later sections and actual Chromebook FPS remain unchecked. This option targets area tinting; it is not a universal fix for animation-heavy levels.
 
 The full candidate validates in V8. Tests verify deterministic output, input integrity, unchanged other function bodies, flag-off behavior, guest stack/return-address handling, preserved registers, and native resume fallback. A final build booted with the real exported flag set to 1, without a test-time WASM replacement. The native heap still reached 1,100 MiB on How to platformer. Compiler-local cleanup and general low-detail experiments were not shipped because they did not establish a reliable benefit. Raw results: `evidence/reduced-area-colors-comparison.json` and `evidence/reduced-area-colors-patch.json`.
+
+## Account cloud-save loading
+
+Account login uses Boomlings, but the native game discovers a separate cloud-save host through `getAccountURL.php` and sends Load requests to `/database/accounts/syncGJAccountNew.php`. The proxy allowlist omitted that host, returning HTTP 403 before the request reached RobTop.
+
+Both the local server and hosted Worker now permit the exact official account hosts `www.robtopgames.org` and `www.robtopgames.net`, limited to the native sync and backup endpoints. They normalize HTTPS, preserve the original POST bytes and response, and prevent response caching. Regression tests cover both hosts/endpoints and reject unrelated destinations.
+
+The live sync route changed from HTTP 403 to HTTP 200 with RobTop's expected `-1` response for dummy accountID 0. The user then confirmed that their real Account → Load restored the cloud save after reloading. No credentials or account save data were collected for the test. See `evidence/account-sync-check.json`.
+
+## Spatial-update Chromebook trial
+
+The user identified iSpy's 11% scene. A read-only native progress probe lets the isolated test fixture reach that scene using the game's existing Ignore Damage preference; this preference is confined to the test save and is not part of the shipped runtime or public trial.
+
+Native `updateObjectSection` already returns for untracked objects and unchanged grid cells. The trial executes those existing returns before lifted x86 register/flag bookkeeping. It uses the original guest RET helper and retains the complete original body for changed cells, unusual floating-point ranges and resumed calls. It does not omit or defer a required section update. Membership removal was audited and already uses constant-time swap-last vectors, so no replacement cache was added.
+
+All 1,685 deterministic differential cases passed using the actual original function and RET code. Disabled/fallback calls match complete VM register and guest-stack state. Fast returns match object bytes, callee-saved registers, stack and return address; volatile register/flag temporaries and dead save slots may differ under the native ABI. Only function12963 gains the prefix; all other bodies, resources and save formats remain exact.
+
+The preceding v2 matching-cell candidate measured 8.60 / 8.30 / 8.28 / 7.85 FPS in four unthrottled Windows/SwiftShader 11%–17% scene samples, Full/Fast/Fast/Full. Means were 8.23 and 8.29 FPS, which does not establish a reliable overall gain. A separate diagnostic found about97% matching-cell returns and no negative cached-X calls in that scene; its counter overhead makes its FPS unsuitable for comparison. The v3 trial additionally handles the native negative cached-X return.
+
+The spatial trial therefore stays off unless `spatial=1` is present. It is intended for actual Chromebook comparison against `spatial=0`, with the same resolution, effects, level and scene. No claim of higher Chromebook FPS is made. Native low-detail settings and compiler passes were also investigated; the first targeted compiler candidate did not improve the paired scene test and is not shipped. Raw investigation results are in `evidence/spatial-trial-investigation.json`.

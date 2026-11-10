@@ -1,0 +1,18 @@
+{
+  "deployment": "appgdep_6af2584bfb44819182305e801a40d22b",
+  "githubCommit": "cf2f42299eb771237576b8ea07ce1f82d7e59590",
+  "sourceCommit": "73388867d152611246a4250426492e36733ea1ff",
+  "before": {
+    "status": 403,
+    "response": "Unsupported game service"
+  },
+  "after": {
+    "target": "https://www.robtopgames.org/database/accounts/syncGJAccountNew.php",
+    "status": 200,
+    "response": "-1",
+    "cache": "no-store",
+    "note": "Dummy accountID0 only; no account data or real credentials used. Before fix this exact route returned403 Unsupported game service."
+  },
+  "userConfirmedAuthenticatedLoad": true,
+  "requestBodyPolicy": "Only dummy accountID0 used by automated checks; no user credentials/save data collected."
+}
