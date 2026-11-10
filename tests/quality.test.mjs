@@ -73,7 +73,7 @@ privateBrowser.select.value = 'performance';
 privateBrowser.select.listeners.change.call(privateBrowser.select);
 assert.deepEqual([privateBrowser.canvas.width, privateBrowser.canvas.height], [960, 540], 'storage failures do not prevent selection');
 
-for (const [quality, width, height] of [['performance', 960, 540], ['standard', 1280, 720], ['high', 1920, 1080]]) {
+for (const [quality, width, height] of [['ultra', 640, 360], ['performance', 960, 540], ['standard', 1280, 720], ['high', 1920, 1080]]) {
   const h = harness('?quality=' + quality);
   assert.deepEqual([h.canvas.width, h.canvas.height], [width, height]);
   h.context.window.__gdInputReady = true;
@@ -82,4 +82,4 @@ for (const [quality, width, height] of [['performance', 960, 540], ['standard', 
   assert.deepEqual(Array.from(h.context.Module.gdCursorPos), [width / 2, height / 2], quality + ' preserves center input mapping');
 }
 
-console.log('Quality checks passed: defaults, saved/URL choices, boot lock, blocked storage, and native pointer scaling at all three resolutions.');
+console.log('Quality checks passed: defaults, saved/URL choices, boot lock, blocked storage, and native pointer scaling at all four resolutions.');

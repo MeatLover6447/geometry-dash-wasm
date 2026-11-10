@@ -9,7 +9,7 @@ The supplied installation is compatible with the runtime: all three executable `
 - [Online-enabled host and FPS test](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/index.html?perf) — public; no ChatGPT sign-in required.
 - [Performance mode for slower devices](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&perf) — 540p rendering with the full native game.
 - [540p with reduced area colors](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&effects=reduced&perf) — optional CPU saving for area-tint-heavy levels; some colors differ.
-- [Experimental spatial-update trial](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=performance&effects=full&spatial=1&perf) — full effects; compare with `spatial=0` on the same device and scene.
+- [360p with reduced area colors](https://geometry-dash-classic-matty.decentdough2.chatgpt.site/game/?quality=ultra&effects=reduced&perf) — lower image resolution for slower devices.
 - [Public GitHub Pages and FPS test](https://meatlover6447.github.io/geometry-dash-wasm/?perf) — built-in levels, editor, and browser saves; online services are unavailable here.
 
 [HOSTING.md](HOSTING.md) describes the deployed builds and checks. First load downloads about 300 MB; repeat visits use the browser cache. Each host keeps separate browser saves.
@@ -18,11 +18,10 @@ GitHub Pages builds are created by `.github/workflows/pages.yml`. Run `node scri
 
 Add `?perf` to the game URL to enable a 20-second native FPS test. Keep the tab visible and play a level during the test. This reports native frame-count averages; it does not measure total input-to-display latency.
 
-Before loading, choose **Performance · 540p**, **Standard · 720p**, or **High · 1080p**. The selector remembers your choice in this browser. A `?quality=performance`, `?quality=standard`, or `?quality=high` URL takes precedence over the saved setting. Standard remains the default. Performance renders 43.75% fewer pixels than Standard; it trades image sharpness for lower GPU work without changing native physics. The setting locks once loading starts.
+Before loading, choose **Ultra performance · 360p**, **Performance · 540p**, **Standard · 720p**, or **High · 1080p**. The selector remembers your choice in this browser. A `?quality=ultra`, `?quality=performance`, `?quality=standard`, or `?quality=high` URL takes precedence over the saved setting. Standard remains the default. Performance renders 43.75% fewer pixels than Standard; it trades image sharpness for lower GPU work without changing native physics. The setting locks once loading starts.
 
 **Reduced area colors** is a separate, optional checkbox. It skips the native area-tint color routine, which can dominate CPU time in levels such as How to platformer (104187415). It changes visual color effects; movement and collision routines are retained. Full native colors are the default. The checkbox remembers your choice; `effects=reduced` or `effects=full` overrides that choice for a launch. Change it before loading, then reload to use another mode.
 
-The **spatial-update trial** requires `spatial=1` in the URL; normal launches leave it off. It shortcuts native bookkeeping when an object's spatial cell is unchanged or the native function already considers it untracked. It preserves native fallbacks, movement, collisions, objects and effects. Desktop scene FPS gains are inconclusive, so this is an opt-in Chromebook comparison, not a promised FPS improvement. `spatial=0` disables the trial without resetting progress.
 
 Double-click **Play.cmd** on Windows. Node.js is already installed on this computer. Or run `node serve.mjs` in this folder and open http://127.0.0.1:4174. Press Ctrl+C in the server window to stop it.
 
@@ -37,7 +36,7 @@ The original game handles its menus, controls, levels, editor, and game modes. P
 - The wrapper defaults to 720p, excludes unrelated site scripts, and waits for saved files to finish restoring before native boot.
 - Legacy Newgrounds download URLs resolve through Geometry Dash's official song metadata. Downloaded audio is read from the native game's AppData folder.
 
-The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. The audio runtime has one downloaded-file lookup fix. The native engine adds 49 bytes for optional area colors and 309 bytes for the default-off spatial trial; disabled paths retain the original instructions. [CHANGES.md](CHANGES.md) includes the measured comparisons and their limits.
+The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. The audio runtime has one downloaded-file lookup fix. The native engine has the existing 49-byte optional area-color guard; the rejected spatial experiment has been removed. [CHANGES.md](CHANGES.md) includes the measured comparisons and their limits.
 
 ## Rebuild and check
 
@@ -52,10 +51,9 @@ node tests/worker.test.mjs
 node tests/quality.test.mjs
 node tests/reduced-effects.test.mjs
 node tests/reduced-area-colors.test.mjs
-node tests/section-updates.test.mjs
 ```
 
-The small patches are in `patches/`. The matching upstream engine, loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies upstream hashes before applying the patches. The complete data package remains byte-identical. Each optional patch changes one function and appends its own control global/export. Tests verify original instructions, disabled/resumed paths, native return handling, and spatial floating-point boundaries.
+The small patches are in `patches/`. The matching upstream engine, loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies upstream hashes before applying the patches. The complete data package remains byte-identical. The optional color patch changes one function and appends its control global/export. Tests verify original instructions, disabled/resumed paths and native return handling.
 
 For the online host, `scripts/prepare-mirror.mjs` stages the browser shell and restricted service bridge. It streams the content-addressed payloads from an exact GitHub commit, keeping the complete game while fitting the host's deployment limit. The native WASM stays gzip-compressed in transit. This uses the existing host's access controls and requires no public CORS proxy.
 

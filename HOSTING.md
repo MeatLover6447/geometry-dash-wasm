@@ -22,7 +22,7 @@ Use the **20s test** button while playing a level to measure average native FPS 
 
 This option is live as build `da52a89ca1b4c322976acaa2`, deployment `appgdep_6af1029199548191b5291ccd5ed20450`. Anonymous HTTP checks confirmed the new engine on both hosts and a working online content-URL service. A public-host Chromium run confirmed the actual native control was enabled, played the first two rooms, and passed pause/resume and restart with no browser errors. See `evidence/reduced-effects-host-check.json`. GitHub Pages workflow run 42534161857 passed all build checks and deployment.
 
-Cloud-save routing is fixed in deployment `appgdep_6af2584bfb44819182305e801a40d22b`, source commit `73388867d152611246a4250426492e36733ea1ff`. The native engine and loader are unchanged. The user confirmed Account → Load works after reloading; `evidence/account-sync-check.json` records the transport checks.
+Cloud-save routing is fixed in deployment `appgdep_6af2584bfb44819182305e801a40d22b`, source commit `73388867d152611246a4250426492e36733ea1ff`. The native engine and loader remained unchanged for that routing fix. The user confirmed Account → Load works after reloading; `evidence/account-sync-check.json` records the transport checks.
 
 - Successful site deployment: `appgdep_6aef9fb4ceb88191a191bd5d71ed1399`
 - Saved version: `appgprj_6aed464a31588191972c138547eda82a~appgver_1a744df2c8b08191ad7671a53bd4f74e`
@@ -43,3 +43,8 @@ Failure: `AppGen input archive exceeds the 256 MiB limit. Package only the requi
 - Pushed source commit: `0b3d4868344d871685da2ec1a2e37a4c3eb7a7aa`
 
 The streaming deployment above resolves this archive limit. The local build still includes the full native game package and has no deployment upload limit.
+
+
+The spatial experiment was withdrawn after the user reported no Chromebook improvement. The runtime returned to its prior native engine hash; the source and results remain in Git history/evidence.
+
+Ultra performance 360p (`quality=ultra`) adds 640×360 rendering. Four local iSpy 11%–14% trials measured 9.60 → 19.59 FPS versus 540p; these are software-renderer desktop results, not Chromebook measurements. Both resolutions used reduced area colors. It trades sharpness for rendering speed and retains the working native engine and cloud-save routes. See `evidence/ultra-resolution-comparison.json`.

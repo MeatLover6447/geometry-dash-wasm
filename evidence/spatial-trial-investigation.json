@@ -1365,5 +1365,9 @@
       }
     ]
   },
-  "conclusion": "Full-scene FPS improvement remains inconclusive. Spatial mode is opt-in; no frames, visuals, required membership updates or physics steps are removed."
+  "conclusion": "Full-scene FPS improvement remains inconclusive. Spatial mode is opt-in; no frames, visuals, required membership updates or physics steps are removed.",
+  "withdrawn": true,
+  "chromebookFeedback": "About the same",
+  "productionEngineRestored": true,
+  "experimentalCodeCommit": "e772ce3a62e7fb6205a784736a0d4d276f8f594a"
 }

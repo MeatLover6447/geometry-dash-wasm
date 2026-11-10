@@ -66,17 +66,6 @@ for (const search of ['', '?effects=reduced', '?effects=full']) {
   assert.equal(calls, 1);
 }
 
-for (const [search, expected] of [['', 0], ['?spatial=1', 1], ['?spatial=0', 0], ['?spatial=unknown', 0]]) {
-  const h = harness(search);
-  const spatial = new WebAssembly.Global({value: 'i32', mutable: true}, 7);
-  const instance = {exports: {gdSectionFastPath: spatial}};
-  h.context.GDAssets.instantiateWasm = (imports, success) => { success(instance, {}); return {}; };
-  h.context.instantiate({}, () => {
-    assert.equal(spatial.value, expected, 'spatial trial requires explicit URL opt-in before native boot');
-    assert.equal(h.context.Module.gdSectionFastPath, spatial);
-  });
-}
-
 const h = harness();
 h.checkbox.checked = true;
 h.checkbox.listeners.change.call(h.checkbox);

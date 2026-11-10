@@ -1,6 +1,6 @@
 # Changes and measured results
 
-The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and optional area-color/spatial controls; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine adds 49 bytes for an opt-in visual-effects guard and 309 bytes for a default-off spatial trial. The complete data-package hash remains unchanged.
+The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and an optional area-color control; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine retains the existing 49-byte optional visual-effects guard. The spatial experiment was removed after Chromebook testing. The complete data-package hash remains unchanged.
 
 ## Startup comparison
 
@@ -82,14 +82,21 @@ Both the local server and hosted Worker now permit the exact official account ho
 
 The live sync route changed from HTTP 403 to HTTP 200 with RobTop's expected `-1` response for dummy accountID 0. The user then confirmed that their real Account → Load restored the cloud save after reloading. No credentials or account save data were collected for the test. See `evidence/account-sync-check.json`.
 
-## Spatial-update Chromebook trial
+## Rejected spatial-update experiment
 
 The user identified iSpy's 11% scene. A read-only native progress probe lets the isolated test fixture reach that scene using the game's existing Ignore Damage preference; this preference is confined to the test save and is not part of the shipped runtime or public trial.
 
 Native `updateObjectSection` already returns for untracked objects and unchanged grid cells. The trial executes those existing returns before lifted x86 register/flag bookkeeping. It uses the original guest RET helper and retains the complete original body for changed cells, unusual floating-point ranges and resumed calls. It does not omit or defer a required section update. Membership removal was audited and already uses constant-time swap-last vectors, so no replacement cache was added.
 
-All 1,685 deterministic differential cases passed using the actual original function and RET code. Disabled/fallback calls match complete VM register and guest-stack state. Fast returns match object bytes, callee-saved registers, stack and return address; volatile register/flag temporaries and dead save slots may differ under the native ABI. Only function12963 gains the prefix; all other bodies, resources and save formats remain exact.
+All 1,685 deterministic differential cases passed using the actual original function and RET code. Disabled/fallback calls match complete VM register and guest-stack state. Fast returns match object bytes, callee-saved registers, stack and return address; volatile register/flag temporaries and dead save slots may differ under the native ABI. Only function 12963 gains the prefix; all other bodies, resources and save formats remain exact.
 
-The preceding v2 matching-cell candidate measured 8.60 / 8.30 / 8.28 / 7.85 FPS in four unthrottled Windows/SwiftShader 11%–17% scene samples, Full/Fast/Fast/Full. Means were 8.23 and 8.29 FPS, which does not establish a reliable overall gain. A separate diagnostic found about97% matching-cell returns and no negative cached-X calls in that scene; its counter overhead makes its FPS unsuitable for comparison. The v3 trial additionally handles the native negative cached-X return.
+The preceding v2 matching-cell candidate measured 8.60 / 8.30 / 8.28 / 7.85 FPS in four unthrottled Windows/SwiftShader 11%–17% scene samples, Full/Fast/Fast/Full. Means were 8.23 and 8.29 FPS, which does not establish a reliable overall gain. A separate diagnostic found about 97% matching-cell returns and no negative cached-X calls in that scene; its counter overhead makes its FPS unsuitable for comparison. The v3 trial additionally handles the native negative cached-X return.
 
-The spatial trial therefore stays off unless `spatial=1` is present. It is intended for actual Chromebook comparison against `spatial=0`, with the same resolution, effects, level and scene. No claim of higher Chromebook FPS is made. Native low-detail settings and compiler passes were also investigated; the first targeted compiler candidate did not improve the paired scene test and is not shipped. Raw investigation results are in `evidence/spatial-trial-investigation.json`.
+The user reported the trial was about the same on the Chromebook. It was withdrawn, and the native engine was restored to the prior working hash. The experimental code remains in Git history at commit e772ce3, with raw results in `evidence/spatial-trial-investigation.json`. It is not part of the current runtime.
+
+
+## Ultra performance 360p
+
+The pre-boot resolution selector now includes 640×360 alongside 540p, 720p and 1080p. It renders 55.6% fewer pixels than 540p, reducing rendering work while trading image sharpness. The native engine, objects, physics, resources and save format remain identical to the working account-sync build. Normal defaults and existing saved choices are retained; `quality=ultra` selects the new mode explicitly.
+
+Four local Windows headless Chromium/SwiftShader samples, ordered 540p/360p/360p/540p, measured 9.80 / 19.70 / 19.47 / 9.41 native FPS in iSpy from about 11% to 14%. Means were **9.60 → 19.59 FPS**; mean frame-p95 was **114.55 → 55.95 ms**. Both resolutions used reduced area colors. Each sample lasted about 3 seconds, without CPU throttling or profiling. An isolated fixture used native Ignore Damage to reach the scene; that setting is not shipped. This software-renderer result is not a Chromebook FPS guarantee. Raw results: `evidence/ultra-resolution-comparison.json`.

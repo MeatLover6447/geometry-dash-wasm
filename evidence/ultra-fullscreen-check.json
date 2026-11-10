@@ -1,0 +1,44 @@
+{
+  "environment": "Windows headless Chromium / SwiftShader, isolated test save; not a Chromebook",
+  "build": "48576fdbbcedb5b65a971443",
+  "level": {
+    "id": "104187415",
+    "name": "How to platformer",
+    "objectCount": 87378,
+    "compressedChars": 572396
+  },
+  "device": {
+    "width": 640,
+    "height": 360,
+    "displayWidth": 1366,
+    "displayHeight": 768,
+    "fullscreen": true,
+    "attributes": {
+      "alpha": false,
+      "antialias": false,
+      "depth": true,
+      "desynchronized": false,
+      "failIfMajorPerformanceCaveat": false,
+      "powerPreference": "high-performance",
+      "premultipliedAlpha": true,
+      "preserveDrawingBuffer": false,
+      "stencil": true,
+      "xrCompatible": false
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "glGlobal": "object",
+    "build": "48576fdbbcedb5b65a971443",
+    "reducedAreaTint": 1
+  },
+  "smoke": {
+    "flag": 1,
+    "frames": 1410,
+    "error": ""
+  },
+  "errors": [],
+  "coverage": [
+    "640x360 drawing buffer retained at 1366x768 fullscreen",
+    "Movement and first jump reached room 2",
+    "Pause, resume and restart screenshots inspected"
+  ]
+}
