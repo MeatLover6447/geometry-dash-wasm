@@ -7,10 +7,8 @@ import { patchWasm, readSections, readU, codeBodies, guard, uleb, sleb, name, se
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const input = gunzipSync(fs.readFileSync(path.join(directory, '../upstream/wasm.gz')));
-const manifest = JSON.parse(fs.readFileSync(path.join(directory, '../dist/gd_assets.json')));
-const candidate = gunzipSync(fs.readFileSync(path.join(directory, '../dist', manifest.wasm.url)));
-const { output, report } = patchWasm(input);
-assert(output.equals(candidate), 'Patching must be deterministic');
+const { output: candidate, report } = patchWasm(input);
+assert.equal(sha(candidate), '72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e', 'Area-color patch output must remain deterministic');
 const before = readSections(input), after = readSections(candidate);
 assert.deepEqual(after.map(s => s.id), before.map(s => s.id));
 for (let i = 0; i < before.length; i++) {

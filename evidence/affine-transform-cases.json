@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "cases": 1011,
+  "trappedCases": 15,
+  "elapsedMs": 28.26539999999997,
+  "counterTotals": {
+    "compactCases": 965,
+    "fallbackCases": 46
+  },
+  "sharedMemoryBytes": 346357760,
+  "comparedRegions": [
+    {
+      "start": 0,
+      "length": 256
+    },
+    {
+      "start": 8192,
+      "length": 2048
+    },
+    {
+      "start": 1048448,
+      "length": 256
+    },
+    {
+      "start": 1064832,
+      "length": 1024
+    },
+    {
+      "start": 1068928,
+      "length": 256
+    },
+    {
+      "start": 346225584,
+      "length": 48
+    },
+    {
+      "start": 346324640,
+      "length": 48
+    },
+    {
+      "start": 346357632,
+      "length": 128
+    }
+  ],
+  "input": {
+    "file": "C:\\Users\\Matty\\Documents\\Codex\\2026-11-05\\i-hav\\work\\reduced-area-tint\\candidate.wasm",
+    "sha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e",
+    "bodyBytes": 1126,
+    "bodySHA256": "fff2415a73b937218148601ad80ed036c040b7af74b6b1f7eb7bc5c4393d1bc4"
+  },
+  "candidate": {
+    "file": "C:\\Users\\Matty\\Documents\\Codex\\2026-11-05\\i-hav\\work\\affine-compact\\candidate.wasm",
+    "sha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a",
+    "bodyBytes": 1957,
+    "bodySHA256": "764ca10657ec414a41ed51dc39c0d7f895189a333c1e28bb2273ad04ed6844db"
+  },
+  "tests": [
+    "full2048-byteCPU",
+    "guest-input-output-and-guards",
+    "return-stack-and-guards",
+    "heap-base-and-resume-slots",
+    "rawIEEE754bits",
+    "signedzero/subnormals/NaN/Inf",
+    "dstA/dstB-overlap-offsets",
+    "input-input-overlap",
+    "high64-bitguestregisters",
+    "nonzero-resume",
+    "CPU/return-stack-alias",
+    "i32-address-wrap",
+    "out-of-bounds-traps"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "kind": "native-function-microbenchmark-not-game-FPS",
+  "warmupPerBatch": 150000,
+  "countPerSample": 1000000,
+  "samples": [
+    {
+      "kind": "original",
+      "iterations": 1000000,
+      "ms": 19.723599999999976,
+      "nsPerCall": 19.723599999999976
+    },
+    {
+      "kind": "compact",
+      "iterations": 1000000,
+      "ms": 8.877099999999984,
+      "nsPerCall": 8.877099999999984
+    },
+    {
+      "kind": "original",
+      "iterations": 1000000,
+      "ms": 19.64580000000001,
+      "nsPerCall": 19.64580000000001
+    },
+    {
+      "kind": "compact",
+      "iterations": 1000000,
+      "ms": 8.942000000000007,
+      "nsPerCall": 8.942000000000007
+    },
+    {
+      "kind": "original",
+      "iterations": 1000000,
+      "ms": 20.245000000000005,
+      "nsPerCall": 20.245000000000005
+    },
+    {
+      "kind": "compact",
+      "iterations": 1000000,
+      "ms": 8.837499999999977,
+      "nsPerCall": 8.837499999999977
+    }
+  ],
+  "medianOriginalNsPerCall": 19.723599999999976,
+  "medianCompactNsPerCall": 8.877099999999984,
+  "functionSpeedup": 2.221851730858052,
+  "elapsedMs": 86.9273,
+  "note": "Same memory, fixed finite nonalias inputs, real extracted native bodies, WASM batch resets RSP per call. Includes identical cross-instance WASM call and RSP-reset overhead; no per-iteration JS or heap copies."
+}

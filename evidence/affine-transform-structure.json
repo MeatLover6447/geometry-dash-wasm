@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "inputSha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e",
+  "candidateSha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a",
+  "toggleSha256": "75c5347199270292c03b9f2237ff0a731dcf24e89da2ec0e4ef62dd848be48ba",
+  "changedOriginalFunction": 4724,
+  "otherOriginalBodiesPreserved": true,
+  "otherSectionsPreserved": true,
+  "originalFallbackInstructionsPreserved": true,
+  "toggleHelperEqualsCandidate": true,
+  "toggleHelperIndex": 26265,
+  "gzipPayloadsVerified": true
+}

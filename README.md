@@ -36,7 +36,7 @@ The original game handles its menus, controls, levels, editor, and game modes. P
 - The wrapper defaults to 720p, excludes unrelated site scripts, and waits for saved files to finish restoring before native boot.
 - Legacy Newgrounds download URLs resolve through Geometry Dash's official song metadata. Downloaded audio is read from the native game's AppData folder.
 
-The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. The audio runtime has one downloaded-file lookup fix. The native engine has the existing 49-byte optional area-color guard; the rejected spatial experiment has been removed. [CHANGES.md](CHANGES.md) includes the measured comparisons and their limits.
+The original compressed asset format, chunk caching, input shim, audio implementation, game resources, and native WASM are upstream work. The audio runtime has one downloaded-file lookup fix. The native engine includes the optional area-color guard and a compact affine-transform path that preserves the original float32 results and VM state. The rejected spatial experiment has been removed. [CHANGES.md](CHANGES.md) includes the measured comparisons and their limits.
 
 ## Rebuild and check
 
@@ -51,9 +51,10 @@ node tests/worker.test.mjs
 node tests/quality.test.mjs
 node tests/reduced-effects.test.mjs
 node tests/reduced-area-colors.test.mjs
+node tests/affine-transform.test.mjs
 ```
 
-The small patches are in `patches/`. The matching upstream engine, loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies upstream hashes before applying the patches. The complete data package remains byte-identical. The optional color patch changes one function and appends its control global/export. Tests verify original instructions, disabled/resumed paths and native return handling.
+The small patches are in `patches/`. The matching upstream engine, loader and manifest are retained in `upstream/`, and raw comparison results are in `evidence/`. The build verifies upstream hashes before applying the patches. The complete data package remains byte-identical. The optional color patch changes one function and appends its control global/export. The affine patch changes one other function, retains its original fallback, and is verified against the original code over 1,011 state comparisons. Tests verify original instructions, disabled/resumed paths and native return handling.
 
 For the online host, `scripts/prepare-mirror.mjs` stages the browser shell and restricted service bridge. It streams the content-addressed payloads from an exact GitHub commit, keeping the complete game while fitting the host's deployment limit. The native WASM stays gzip-compressed in transit. This uses the existing host's access controls and requires no public CORS proxy.
 

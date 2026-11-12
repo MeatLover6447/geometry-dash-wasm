@@ -1,6 +1,6 @@
 # Changes and measured results
 
-The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, and an optional area-color control; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine retains the existing 49-byte optional visual-effects guard. The spatial experiment was removed after Chromebook testing. The complete data-package hash remains unchanged.
+The native engine is Bog's compiled port. This build changes the browser wrapper, asset loader, serving layer, downloaded-audio path lookup, an optional area-color control, and an equivalent affine-transform optimization; it does not claim authorship of the original port. The original native WASM SHA-256 is `523d9362955eba27a8ce64ec9b4fda496c8ecc30e6ac9ca1f01cc76c89a5a15a`; it is retained in `upstream/wasm.gz`. The current engine retains the existing 49-byte optional visual-effects guard and adds an 831-byte affine fast path with its original fallback. The spatial experiment was removed after Chromebook testing. The complete data-package hash remains unchanged.
 
 ## Startup comparison
 
@@ -100,3 +100,15 @@ The user reported the trial was about the same on the Chromebook. It was withdra
 The pre-boot resolution selector now includes 640×360 alongside 540p, 720p and 1080p. It renders 55.6% fewer pixels than 540p, reducing rendering work while trading image sharpness. The native engine, objects, physics, resources and save format remain identical to the working account-sync build. Normal defaults and existing saved choices are retained; `quality=ultra` selects the new mode explicitly.
 
 Four local Windows headless Chromium/SwiftShader samples, ordered 540p/360p/360p/540p, measured 9.80 / 19.70 / 19.47 / 9.41 native FPS in iSpy from about 11% to 14%. Means were **9.60 → 19.59 FPS**; mean frame-p95 was **114.55 → 55.95 ms**. Both resolutions used reduced area colors. Each sample lasted about 3 seconds, without CPU throttling or profiling. An isolated fixture used native Ignore Damage to reach the scene; that setting is not shipped. This software-renderer result is not a Chromebook FPS guarantee. Raw results: `evidence/ultra-resolution-comparison.json`.
+
+## Denouement transform optimization
+
+The user reported Denouement (60619762) lagging throughout at 360p, with per-level LDM, Extra LDM and the separate Settings → Help low-detail mode already enabled. Profiling found native object movement and transforms among the remaining costs; those movements and camera updates are retained. Compiler cleanup and graphics-state-cache trials did not establish a reliable improvement and are not shipped.
+
+The native cocos2d `CCAffineTransformConcat` function (WASM 4724) now computes the same float32 operations in the same operand and guest-memory order using local temporaries. It commits the exact final VM register state once, avoiding repeated intermediate register copies. The original function remains the fallback for resumed calls, invalid bounds and protected memory aliases. All other function bodies, resources, level objects, saves and the audio loader remain unchanged from the preceding build.
+
+Independent original-vs-candidate tests passed 1,011 cases, including raw float bits, signed zero, subnormals, NaN/Infinity, overlapping input/output, all 2,048 CPU bytes, return-stack aliases, resume state and 15 matching traps. A one-million-call batched WASM microbenchmark measured median 19.72 → 8.88 ns/call (2.22× function throughput), which is not a game FPS claim.
+
+A single-instance original/compact/compact/original comparison at roughly 5%–20% of Denouement measured **22.98 / 24.73 / 27.18 / 24.97 FPS**. Means were **23.97 → 25.95 FPS (+8.3%)**, with mean frame-p95 **79.65 → 62.50 ms**. A prior warmup and an extra original-mode check are retained in the evidence. Each sample lasted nine seconds at 360p with all low-detail settings on and CPU throttling4; no CPU profiler or graphics instrumentation ran during the samples. The test-only toggle is not included in production.
+
+These are Windows headless Chromium/SwiftShader results, not Chromebook or ARM measurements. The fixture used native Ignore Damage solely to reach the scene; that preference is not shipped. Full-level and Chromebook performance remain to be measured. See `evidence/denouement-affine-comparison.json` and the `evidence/affine-transform-*` files.

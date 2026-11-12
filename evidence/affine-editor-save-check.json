@@ -1,0 +1,10 @@
+{
+  "savedBytes": 864,
+  "reloadBytes": 864,
+  "identical": true,
+  "errors": [],
+  "build": "abca74c7a81d7c1d171feac8",
+  "wasmSha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a",
+  "nativeLevelObjects": 1,
+  "environment": "Isolated Windows headless Chromium browser; no user save/profile"
+}

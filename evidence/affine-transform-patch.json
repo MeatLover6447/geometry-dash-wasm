@@ -1,0 +1,27 @@
+{
+  "inputSha256": "72dfc0317b8c2b45a856a0a9b8a11be71e25d79d6b055ed04bc43c138efa1b4e",
+  "inputBytes": 123481559,
+  "outputSha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a",
+  "outputBytes": 123482390,
+  "functionIndex": 4724,
+  "originalBodySha256": "fff2415a73b937218148601ad80ed036c040b7af74b6b1f7eb7bc5c4393d1bc4",
+  "patchedBodySha256": "764ca10657ec414a41ed51dc39c0d7f895189a333c1e28bb2273ad04ed6844db",
+  "originalBodyBytes": 1126,
+  "patchedBodyBytes": 1957,
+  "prefixBytes": 825,
+  "declarationsBytes": 13,
+  "originalDeclarationsBytes": 7,
+  "changedSections": [
+    10
+  ],
+  "changedFunctions": [
+    4724
+  ],
+  "originalFallbackPreserved": true,
+  "nonzeroResumeUsesOriginal": true,
+  "protectedMemoryAliasesUseOriginal": true,
+  "strictFloat32OperandOrder": true,
+  "validatedByNode": true,
+  "gzipBytes": 28988468,
+  "gzipSha256": "4fa09f1dca30365ecb645379beb40965e5422a064736d797b18268202ef74710"
+}
