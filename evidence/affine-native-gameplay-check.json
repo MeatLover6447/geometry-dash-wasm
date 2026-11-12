@@ -1,0 +1,67 @@
+{
+  "build": "abca74c7a81d7c1d171feac8",
+  "level": {
+    "id": "60619762",
+    "name": "Denouement",
+    "objectCount": 15316,
+    "compressedChars": 165060
+  },
+  "device": {
+    "width": 640,
+    "height": 360,
+    "displayWidth": 1366,
+    "displayHeight": 768,
+    "fullscreen": true,
+    "attributes": {
+      "alpha": false,
+      "antialias": false,
+      "depth": true,
+      "desynchronized": false,
+      "failIfMajorPerformanceCaveat": false,
+      "powerPreference": "high-performance",
+      "premultipliedAlpha": true,
+      "preserveDrawingBuffer": false,
+      "stencil": true,
+      "xrCompatible": false
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "glGlobal": "object",
+    "build": "abca74c7a81d7c1d171feac8",
+    "reducedAreaTint": 1
+  },
+  "progressStart": {
+    "ready": true,
+    "percent": 60.01155471801758,
+    "manager": 357594400,
+    "layer": 474483440,
+    "level": 357635120,
+    "player": 727787344,
+    "playerX": 9320.75390625,
+    "levelLength": 15531.599609375,
+    "timestamp": 0,
+    "progress": 17048,
+    "activeLDM": true,
+    "extraLDM": true,
+    "ignoreDamage": true,
+    "basis": "native CCNode positionX / levelLength"
+  },
+  "progressEnd": {
+    "ready": true,
+    "percent": 64.10964965820312,
+    "manager": 357594400,
+    "layer": 474483440,
+    "level": 357635120,
+    "player": 727787344,
+    "playerX": 9957.25390625,
+    "levelLength": 15531.599609375,
+    "timestamp": 0,
+    "progress": 18264,
+    "activeLDM": true,
+    "extraLDM": true,
+    "ignoreDamage": true,
+    "basis": "native CCNode positionX / levelLength"
+  },
+  "error": "",
+  "errors": [],
+  "coverage": "Production engine/fullscreen played to60%–64% using isolated native IgnoreDamage fixture, not a performance comparison or Chromebook result."
+}

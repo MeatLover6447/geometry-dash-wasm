@@ -1,0 +1,96 @@
+{
+  "deployment": "appgdep_6af52be129cc81918e045cefd5ead810",
+  "version": "appgprj_6aed464a31588191972c138547eda82a~appgver_7c37f5ab62608191b287d67d92fbc98d",
+  "sourceCommit": "814453c3d5683ab32933ef5acedd667cd865ba9f",
+  "githubCommit": "086be229d55d545173ca732d99805329ee4cdf8d",
+  "githubActions": {
+    "run": 43145149144,
+    "conclusion": "success"
+  },
+  "http": {
+    "build": "abca74c7a81d7c1d171feac8",
+    "engineSha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a",
+    "loaderSha256": "d2446031416e2aabd7961ede27414bf12776cdde0be3ecf3082171436c1c3872",
+    "engine": {
+      "status": 200,
+      "mime": "application/wasm",
+      "encoding": "gzip"
+    },
+    "cloudSave": {
+      "status": 200,
+      "response": "-1",
+      "cache": "no-store",
+      "dummyAccountOnly": true
+    },
+    "pages": {
+      "build": "d5da7df52e0bad1984977e1a",
+      "engineSha256": "feb044f268003cc60e64825f6c825f5e86f945c6c5bbb4a2b0fc5577e297404a"
+    }
+  },
+  "browser": {
+    "device": {
+      "width": 640,
+      "height": 360,
+      "displayWidth": 1366,
+      "displayHeight": 768,
+      "fullscreen": true,
+      "attributes": {
+        "alpha": false,
+        "antialias": false,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": true,
+        "xrCompatible": false
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "glGlobal": "object",
+      "build": "abca74c7a81d7c1d171feac8",
+      "reducedAreaTint": 1
+    },
+    "level": {
+      "id": "60619762",
+      "name": "Denouement",
+      "objectCount": 15316,
+      "compressedChars": 165060
+    },
+    "progressStart": {
+      "ready": true,
+      "percent": 5.005136013031006,
+      "manager": 357594400,
+      "layer": 474483440,
+      "level": 357635120,
+      "player": 712000936,
+      "playerX": 777.377685546875,
+      "levelLength": 15531.599609375,
+      "timestamp": 0,
+      "progress": 720,
+      "activeLDM": true,
+      "extraLDM": true,
+      "ignoreDamage": true,
+      "basis": "native CCNode positionX / levelLength"
+    },
+    "progressEnd": {
+      "ready": true,
+      "percent": 9.101799011230469,
+      "manager": 357594400,
+      "layer": 474483440,
+      "level": 357635120,
+      "player": 712000936,
+      "playerX": 1413.655029296875,
+      "levelLength": 15531.599609375,
+      "timestamp": 0,
+      "progress": 1936,
+      "activeLDM": true,
+      "extraLDM": true,
+      "ignoreDamage": true,
+      "basis": "native CCNode positionX / levelLength"
+    },
+    "error": "",
+    "errors": [],
+    "coverage": "Public native boot, fullscreen and Denouement5%–9%; isolated IgnoreDamage fixture only, not a Chromebook performance comparison"
+  }
+}
